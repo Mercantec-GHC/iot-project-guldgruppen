@@ -1,4 +1,0 @@
-#define SECRET_SSID "Zyxel_BA2F"
-#define SECRET_PASS "G7QLB4EAMY"
-#define SECRET_MQTTSERVER "dc0af13344134b549d28156890b13f72.s1.eu.hivemq.cloud"
-#define SECRET_MQTTPASS "Mysamus123!"
