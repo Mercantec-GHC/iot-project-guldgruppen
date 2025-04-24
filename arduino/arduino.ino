@@ -3,7 +3,6 @@
 MKRIoTCarrier carrier;
 
 int pir = A5;
-bool alarmEnabled = true;
 bool screenActive = false;
 unsigned long screenOnTime = 0;  // Time when screen was activated
 const unsigned long screenDuration = 30000; // 30 seconds
@@ -26,9 +25,9 @@ void loop() {
   unsigned long currentTime = millis();
 
   Serial.print("PIR Sensor: ");
-  Serial.println(motion == HIGH && alarmEnabled ? "MOTION DETECTED!" : "No motion");
+  Serial.println(motion == HIGH ? "MOTION DETECTED!" : "No motion");
 
-  if (motion == HIGH && alarmEnabled) {
+  if (motion == HIGH ) {
     if (!screenActive) {
       // Turn on screen and ask for pin code
       carrier.display.fillScreen(0xFFFF); // White background
