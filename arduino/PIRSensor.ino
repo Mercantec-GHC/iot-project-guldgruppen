@@ -1,3 +1,7 @@
+bool screenActive = false;
+unsigned long screenOnTime = 0;  // Time when screen was activated
+const unsigned long screenDuration = 30000; // 30 seconds
+
 void getPIRSensorRead() {
   int motion = digitalRead(pir);
   unsigned long currentTime = millis();
