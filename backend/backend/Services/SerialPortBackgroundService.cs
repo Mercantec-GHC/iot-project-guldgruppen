@@ -30,7 +30,7 @@ public class SerialPortBackgroundService : BackgroundService
         _serialPort = new SerialPort
         {
             
-            PortName = "COM8", // Change to your Arduino's COM port
+            PortName = "COM3", // Change to your Arduino's COM port
             BaudRate = 9600,
             Parity = Parity.None,
             DataBits = 8,
