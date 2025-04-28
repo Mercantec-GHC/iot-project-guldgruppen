@@ -3,6 +3,8 @@
 MKRIoTCarrier carrier;
 
 int pir = A5;
+unsigned long lastSensorRead = 0;
+const unsigned long sensorInterval = 1000; // 1 second
 
 void setup() {
   Serial.begin(9600);
@@ -18,9 +20,16 @@ void setup() {
 }
 
 void loop() {
-  getTemperaturSensorRead();
-  getMoistureSensorRead();
-  getPIRSensorRead();
 
-  delay(1000);
+  carrier.Buttons.update();
+  unsigned long currentMillis = millis();
+
+  getPIRSensorRead();  // Always check for PIR and button touches immediately
+
+  if (currentMillis - lastSensorRead >= sensorInterval) {
+    lastSensorRead = currentMillis;
+    
+    getTemperaturSensorRead();
+    getMoistureSensorRead();
+  }
 }
