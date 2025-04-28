@@ -68,7 +68,7 @@ void getPIRSensorRead() {
       carrier.display.setCursor(30, 100);
       carrier.display.print("Pin code:");
       screenActive = true;  // Set screen to active
-   }
+  }
 
   if (screenActive) {
     // PIN code entry and handling
