@@ -1,25 +1,18 @@
 using backend.Repositories;
-using backend.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container BEFORE calling builder.Build()
+// Force the application to listen on 0.0.0.0:5000
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
-// Add background service
-builder.Services.AddHostedService<SerialPortBackgroundService>();
-
-// Add EF Core Database Context
+// Add services to the container
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add repository
 builder.Services.AddScoped<ISensorRepository, SensorRepository>();
 
-// Add controllers
 builder.Services.AddControllers();
-
-// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -30,20 +23,18 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build(); // After this point, you can't add services anymore
+var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// Configure pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Enhanced request logging
 app.Use(async (context, next) =>
 {
     var remoteIp = context.Connection.RemoteIpAddress;
@@ -53,7 +44,7 @@ app.Use(async (context, next) =>
 });
 
 app.UseHttpsRedirection();
-app.UseCors(); // Use the default policy we configured earlier
+app.UseCors();
 app.UseAuthorization();
 app.MapControllers();
 

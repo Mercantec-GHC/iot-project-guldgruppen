@@ -8,7 +8,7 @@ function App() {
     useEffect(() => {
         const fetchSensorData = async () => {
             try {
-                const response = await fetch('https://localhost:44393/api/Sensor');
+                const response = await fetch('http://176.9.37.136:5000/api/Sensor');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

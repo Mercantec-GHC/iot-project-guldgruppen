@@ -18,36 +18,40 @@ public class SensorController : ControllerBase
     [HttpPost("temperature")]
     public async Task<IActionResult> PostTemperature([FromBody] TemperatureReadingDto dto)
     {
+
         var reading = new SensorReading
         {
             Temperature = dto.Temperature,
             Timestamp = DateTime.UtcNow
         };
-        await _repository.AddAsync(reading);
+        await _repository.UpsertAsync(reading);
         return Ok();
     }
+
 
     [HttpPost("motion")]
     public async Task<IActionResult> PostMotion([FromBody] MotionReadingDto dto)
     {
+
         var reading = new SensorReading
         {
             MotionDetected = dto.MotionDetected,
             Timestamp = DateTime.UtcNow
         };
-        await _repository.AddAsync(reading);
+        await _repository.UpsertAsync(reading);
         return Ok();
     }
 
     [HttpPost("moisture")]
     public async Task<IActionResult> PostMoisture([FromBody] MoistureReadingDto dto)
     {
+
         var reading = new SensorReading
         {
             MoistureLevel = dto.MoistureLevel,
             Timestamp = DateTime.UtcNow
         };
-        await _repository.AddAsync(reading);
+        await _repository.UpsertAsync(reading);
         return Ok();
     }
 
@@ -61,6 +65,7 @@ public class SensorController : ControllerBase
     [HttpPost("reading")]
     public async Task<IActionResult> PostCombinedReading([FromBody] CombinedReadingDto dto)
     {
+
         var reading = new SensorReading
         {
             Temperature = dto.Temperature,
@@ -68,10 +73,11 @@ public class SensorController : ControllerBase
             MoistureLevel = dto.MoistureLevel,
             Timestamp = DateTime.UtcNow
         };
-    
-        await _repository.AddAsync(reading);
+
+        await _repository.UpsertAsync(reading);
         return Ok();
     }
+
 }
 
 // DTO classes
