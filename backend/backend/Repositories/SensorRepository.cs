@@ -34,7 +34,6 @@ public class SensorRepository : ISensorRepository
     
         if (existing != null)
         {
-            // Update the existing reading
             existing.Temperature = reading.Temperature;
             existing.MotionDetected = reading.MotionDetected;
             existing.MoistureLevel = reading.MoistureLevel;
@@ -44,7 +43,6 @@ public class SensorRepository : ISensorRepository
         }
         else
         {
-            // Insert a new reading
             await _context.SensorReadings.AddAsync(reading);
         }
 

@@ -26,7 +26,6 @@ public class SerialPortBackgroundService : BackgroundService
     {
         _logger.LogInformation("SerialPortBackgroundService starting...");
         
-        // Configure serial port (adjust these values to match your Arduino settings)
         _serialPort = new SerialPort
         {
             
@@ -56,7 +55,7 @@ public class SerialPortBackgroundService : BackgroundService
                         await ProcessMessage(message);
                     }
                 }
-                catch (TimeoutException) { /* Normal during waiting period */ }
+                catch (TimeoutException) {}
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error reading from serial port");

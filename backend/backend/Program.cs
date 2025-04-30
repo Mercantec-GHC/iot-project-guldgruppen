@@ -3,10 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Force the application to listen on 0.0.0.0:5000
 builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
-// Add services to the container
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -28,7 +26,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
