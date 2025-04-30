@@ -1,4 +1,4 @@
-const int PIR_PIN = 2; // Connect your PIR sensor to digital pin 2
+const int PIR_PIN = A5;
 
 void setupPIRSensor() {
   pinMode(PIR_PIN, INPUT);

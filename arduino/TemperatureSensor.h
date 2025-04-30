@@ -1,4 +1,4 @@
-#include <Arduino_MKRENV.h> // Assuming you use the ENV shield for temperature sensor
+#include <Arduino_MKRENV.h>
 
 void setupTemperatureSensor() {
   if (!ENV.begin()) {

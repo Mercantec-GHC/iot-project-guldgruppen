@@ -5,19 +5,19 @@
 #include "MoistureSensor.h"
 
 // Wi-Fi credentials
-char ssid[] = "Zyxel_BA2F";     // <-- Change to your WiFi name
-char pass[] = "G7QLB4EAMY"; // <-- Change to your WiFi password
+char ssid[] = "Zyxel_BA2F";
+char pass[] = "G7QLB4EAMY";
 
 // Server settings
-char serverAddress[] = "176.9.37.136"; // e.g., "192.168.1.100" or external IP/domain
-int serverPort = 5000;                   // Your API port
+char serverAddress[] = "176.9.37.136";
+int serverPort = 5000;
 
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, serverAddress, serverPort);
 
 // Timing
 unsigned long lastPostTime = 0;
-const unsigned long postInterval = 1000; // Post every 1 seconds
+const unsigned long postInterval = 1000;
 
 void setup() {
   Serial.begin(9600);
@@ -52,7 +52,7 @@ void sendSensorData(float temperature, bool motionDetected, int moisture) {
                     ",\"moistureLevel\":" + String(moisture) + "}";
 
   client.beginRequest();
-  client.post("/api/sensor/reading"); // matches your API endpoint
+  client.post("/api/sensor/reading");
   client.sendHeader("Content-Type", "application/json");
   client.sendHeader("Content-Length", postData.length());
   client.beginBody();

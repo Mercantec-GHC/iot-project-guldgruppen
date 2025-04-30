@@ -1,4 +1,6 @@
-const int MOISTURE_PIN = A1; // Analog pin A1 for moisture sensor
+const int MOISTURE_PIN = A1;
+
+void setupMoistureSensor(){}
 
 int readMoistureLevel() {
   int sensorValue = analogRead(MOISTURE_PIN);
