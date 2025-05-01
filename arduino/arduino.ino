@@ -12,6 +12,9 @@ char pass[] = "G7QLB4EAMY";
 char serverAddress[] = "176.9.37.136";
 int serverPort = 5000;
 
+// Unique Arduino GUID
+const char* arduinoId = "123e4567-e89b-12d3-a456-426614174000";
+
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, serverAddress, serverPort);
 
@@ -47,7 +50,8 @@ void loop() {
 }
 
 void sendSensorData(float temperature, bool motionDetected, int moisture) {
-  String postData = "{\"temperature\":" + String(temperature, 2) +
+  String postData = "{\"arduinoId\":\"" + String(arduinoId) + "\"," +
+                    "\"temperature\":" + String(temperature, 2) +
                     ",\"motionDetected\":" + String(motionDetected ? "true" : "false") +
                     ",\"moistureLevel\":" + String(moisture) + "}";
 

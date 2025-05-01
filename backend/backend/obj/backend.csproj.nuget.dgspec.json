@@ -1,28 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\backend.csproj": {}
+    "/Users/mikkelkonyher/Documents/GitHub/iot-project-guldgruppen/backend/backend/backend.csproj": {}
   },
   "projects": {
-    "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\backend.csproj": {
+    "/Users/mikkelkonyher/Documents/GitHub/iot-project-guldgruppen/backend/backend/backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\backend.csproj",
+        "projectUniqueName": "/Users/mikkelkonyher/Documents/GitHub/iot-project-guldgruppen/backend/backend/backend.csproj",
         "projectName": "backend",
-        "projectPath": "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\backend.csproj",
-        "packagesPath": "C:\\Users\\sck\\.nuget\\packages\\",
-        "outputPath": "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\obj\\",
+        "projectPath": "/Users/mikkelkonyher/Documents/GitHub/iot-project-guldgruppen/backend/backend/backend.csproj",
+        "packagesPath": "/Users/mikkelkonyher/.nuget/packages/",
+        "outputPath": "/Users/mikkelkonyher/Documents/GitHub/iot-project-guldgruppen/backend/backend/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\sck\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/mikkelkonyher/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -39,8 +36,9 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "direct"
-        }
+          "auditMode": "all"
+        },
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -84,24 +82,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.14, 8.0.14]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.14, 8.0.14]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.14, 8.0.14]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.14, 8.0.14]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -110,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

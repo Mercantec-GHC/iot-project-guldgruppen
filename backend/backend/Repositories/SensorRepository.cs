@@ -22,6 +22,13 @@ public class SensorRepository : ISensorRepository
         return await _context.SensorReadings.FindAsync(id);
     }
 
+    public async Task<IEnumerable<SensorReading>> GetByArduinoIdAsync(string arduinoId)
+    {
+        return await _context.SensorReadings
+            .Where(r => r.ArduinoId == arduinoId)
+            .ToListAsync();
+    }
+
     public async Task AddAsync(SensorReading reading)
     {
         await _context.SensorReadings.AddAsync(reading);
@@ -30,7 +37,8 @@ public class SensorRepository : ISensorRepository
     
     public async Task UpsertAsync(SensorReading reading)
     {
-        var existing = await _context.SensorReadings.FirstOrDefaultAsync();
+        var existing = await _context.SensorReadings
+            .FirstOrDefaultAsync(r => r.ArduinoId == reading.ArduinoId);
     
         if (existing != null)
         {
@@ -49,10 +57,21 @@ public class SensorRepository : ISensorRepository
         await _context.SaveChangesAsync();
     }
 
-    
     public async Task DeleteAllAsync()
     {
         _context.SensorReadings.RemoveRange(_context.SensorReadings);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteIfExistsAsync(string arduinoId)
+    {
+        var existingReading = await _context.SensorReadings
+            .FirstOrDefaultAsync(r => r.ArduinoId == arduinoId);
+
+        if (existingReading != null)
+        {
+            _context.SensorReadings.Remove(existingReading);
+            await _context.SaveChangesAsync();
+        }
     }
 }
