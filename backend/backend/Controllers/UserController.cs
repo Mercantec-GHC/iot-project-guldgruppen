@@ -37,7 +37,8 @@ public class UsersController : ControllerBase
             {
                 id = u.id,
                 Username = u.Username,
-                Email = u.Email
+                Email = u.Email,
+                ArduinoId = u.ArduinoId // Map ArduinoId
             })
             .ToListAsync();
 
@@ -54,7 +55,8 @@ public class UsersController : ControllerBase
             {
                 id = u.id,
                 Username = u.Username,
-                Email = u.Email
+                Email = u.Email,
+                ArduinoId = u.ArduinoId // Map ArduinoId
             })
             .FirstOrDefaultAsync();
 
