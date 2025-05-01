@@ -1,23 +1,22 @@
 import { useState } from 'react';
+import './SignUp.css';
 
 function SignUp() {
-    // States for form data and validation
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [region, setRegion] = useState('Copenhagen'); // Default to Copenhagen
+    const [region, setRegion] = useState('Copenhagen');
     const [message, setMessage] = useState('');
 
-    // Function to handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Create the ArduinoId based on the selected region
         const arduinoId = region === 'Copenhagen'
             ? '123e4567-e89b-12d3-a456-426614174000'
-            : '123e4567-e89b-12d3-a456-426614174001';
+            : region === 'Skive'
+                ? '123e4567-e89b-12d3-a456-426614174001'
+                : '123e4567-e89b-12d3-a456-426614174002';
 
-        // Create the user object to send to the API
         const userData = {
             username,
             email,
@@ -25,7 +24,6 @@ function SignUp() {
             arduinoId
         };
 
-        // Send POST request to API to create a new user
         try {
             const response = await fetch('http://176.9.37.136:5001/api/Users', {
                 method: 'POST',
@@ -37,7 +35,6 @@ function SignUp() {
 
             if (response.ok) {
                 setMessage('User created successfully!');
-                // Clear the form after successful submission
                 setUsername('');
                 setEmail('');
                 setPassword('');
@@ -84,10 +81,11 @@ function SignUp() {
                 </div>
 
                 <div className="form-group">
-                    <label>Choose Region</label>
+                    <label>Select the Office Location You Wish to Receive Environmental Sensor Data From</label>
                     <select value={region} onChange={(e) => setRegion(e.target.value)}>
                         <option value="Copenhagen">Copenhagen</option>
                         <option value="Skive">Skive</option>
+                        <option value="Aalborg">Aalborg</option>
                     </select>
                 </div>
 

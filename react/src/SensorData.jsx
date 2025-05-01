@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import GaugeComponent from 'react-gauge-component';
+import './SensorData.css';
 
 
 function SensorData() {
@@ -9,7 +10,7 @@ function SensorData() {
     useEffect(() => {
         const fetchUserAndSensorData = async () => {
             try {
-                const userRes = await fetch('http://176.9.37.136:5001/api/Users/1');
+                const userRes = await fetch('http://176.9.37.136:5001/api/Users/1'); // will be replaced with the logged-in user ID
                 if (!userRes.ok) throw new Error('Failed to fetch user');
                 const userData = await userRes.json();
 
