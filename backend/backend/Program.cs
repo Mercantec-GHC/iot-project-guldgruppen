@@ -1,4 +1,5 @@
 using backend.Repositories;
+using backend.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ISensorRepository, SensorRepository>();
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<JwtTokenService>(); // Register JwtTokenService
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
