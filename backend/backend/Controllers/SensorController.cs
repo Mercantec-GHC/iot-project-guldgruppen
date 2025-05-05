@@ -77,10 +77,14 @@ public class SensorController : ControllerBase
         return Ok();
     }
     
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [HttpGet("{arduinoId}")]
+    public async Task<IActionResult> GetByArduinoId(string arduinoId)
     {
-        var readings = await _repository.GetAllAsync();
+        var readings = await _repository.GetByArduinoIdAsync(arduinoId);
+        if (readings == null || !readings.Any())
+        {
+            return NotFound($"No readings found for ArduinoId: {arduinoId}");
+        }
         return Ok(readings);
     }
 
