@@ -25,7 +25,7 @@ function SignUp() {
         };
 
         try {
-            const response = await fetch('http://176.9.37.136:5001/api/Users', {
+            const response = await fetch('http://176.9.37.136:5001/api/Auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
