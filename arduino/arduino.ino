@@ -5,15 +5,15 @@
 #include "MoistureSensor.h"
 
 // Wi-Fi credentials
-char ssid[] = "iPhone";
-char pass[] = "mysamus123";
+char ssid[] = "Zyxel_BA2F";
+char pass[] = "G7QLB4EAMY";
 
 // Server settings
 char serverAddress[] = "176.9.37.136";
 int serverPort = 5001;
 
 // Unique Arduino GUID
-const char* arduinoId = "123e4567-e89b-12d3-a456-426614174000";
+const char* arduinoId = "123e4567-e89b-12d3-a456-426614174001";
 
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, serverAddress, serverPort);

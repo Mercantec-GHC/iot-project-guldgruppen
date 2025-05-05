@@ -76,6 +76,13 @@ public class SensorController : ControllerBase
         await _repository.UpsertAsync(reading);
         return Ok();
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var readings = await _repository.GetAllAsync();
+        return Ok(readings);
+    }
 
     [HttpPost("reading")]
     public async Task<IActionResult> PostCombinedReading([FromBody] CombinedReadingDto dto)
