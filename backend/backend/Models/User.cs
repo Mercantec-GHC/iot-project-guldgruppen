@@ -7,7 +7,8 @@ public class User
     
     public int id { get; set; }
     public string Username { get; set; }
-    public string Password { get; set; }
+    public string PasswordHash { get; set; }
+    public string PasswordSalt { get; set; }
     public string Email { get; set; }
     
     public string ArduinoId { get; set; }  
@@ -21,4 +22,18 @@ public class UserDTO
     public string Email { get; set; }
     
     public string ArduinoId { get; set; }  
+}
+
+public class UserDtoRegister
+{
+    public string Username { get; set; }
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public string ArduinoId { get; set; }
+}
+
+public class UserDtoLogin
+{
+    public string Email { get; set; }
+    public string Password { get; set; }
 }

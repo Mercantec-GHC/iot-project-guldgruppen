@@ -13,21 +13,6 @@ public class UsersController : ControllerBase
         _context = context;
     }
 
-    // POST: api/Users
-    [HttpPost]
-    public async Task<IActionResult> CreateUser([FromBody] User user)
-    {
-        if (user == null)
-        {
-            return BadRequest("User is null.");
-        }
-
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetUserById), new { id = user.id }, user);
-    }
-
     // GET: api/Users
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
@@ -38,7 +23,7 @@ public class UsersController : ControllerBase
                 id = u.id,
                 Username = u.Username,
                 Email = u.Email,
-                ArduinoId = u.ArduinoId // Map ArduinoId
+                ArduinoId = u.ArduinoId
             })
             .ToListAsync();
 
@@ -56,7 +41,7 @@ public class UsersController : ControllerBase
                 id = u.id,
                 Username = u.Username,
                 Email = u.Email,
-                ArduinoId = u.ArduinoId // Map ArduinoId
+                ArduinoId = u.ArduinoId
             })
             .FirstOrDefaultAsync();
 
