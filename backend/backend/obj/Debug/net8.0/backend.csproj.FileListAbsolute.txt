@@ -715,3 +715,12 @@ G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\obj
 G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\obj\Debug\net8.0\backend.pdb
 G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\obj\Debug\net8.0\backend.genruntimeconfig.cache
 G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\obj\Debug\net8.0\ref\backend.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.Bcl.Memory.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll

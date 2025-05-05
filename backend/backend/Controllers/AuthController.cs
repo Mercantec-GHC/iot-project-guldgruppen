@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using backend.Models;
 using backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,13 +50,15 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] UserDtoLogin request)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (user == null || !VerifyPasswordHash(request.Password, Convert.FromBase64String(user.PasswordHash), Convert.FromBase64String(user.PasswordSalt)))
+        if (user == null || !VerifyPasswordHash(request.Password, 
+                Convert.FromBase64String(user.PasswordHash), 
+                Convert.FromBase64String(user.PasswordSalt)))
         {
-            return Unauthorized("Invalid credentials.");
+            return Unauthorized(new { message = "Invalid credentials." });
         }
 
         string token = _jwtTokenService.GenerateToken(user.Email);
-        return Ok(new { Token = token });
+        return Ok(new { token = token }); // Use lowercase 'token' for consistency
     }
 
     private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -77,11 +80,23 @@ public class AuthController : ControllerBase
     }
     
     // GET: api/Auth/userid
+    [Authorize]
     [HttpGet("userid")]
     public async Task<IActionResult> GetUserId()
     {
+        Console.WriteLine($"Authorization header: {Request.Headers["Authorization"]}");
+    
+        if (User?.Identity?.IsAuthenticated != true)
+        {
+            Console.WriteLine("User not authenticated");
+            return Unauthorized("Invalid token or user not authenticated.");
+        }
+
+        Console.WriteLine($"Authenticated user: {User.Identity.Name}");
+        
         // Extract the email from the JWT token
         var email = User?.Identity?.Name;
+        Console.WriteLine($"Email from token: {email}"); // Debug logging
 
         if (string.IsNullOrEmpty(email))
         {
@@ -90,6 +105,7 @@ public class AuthController : ControllerBase
 
         // Find the user by email
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        Console.WriteLine($"Found user ID: {user?.id}"); // Debug logging
 
         if (user == null)
         {

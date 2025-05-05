@@ -10,15 +10,39 @@ function SensorData() {
     useEffect(() => {
         const fetchUserAndSensorData = async () => {
             try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No token found');
+                }
+
                 // Fetch the user ID from the Auth endpoint
                 const userIdRes = await fetch('http://176.9.37.136:5001/api/Auth/userid', {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include the token in the Authorization header
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     },
+                    credentials: 'include'
                 });
-                if (!userIdRes.ok) throw new Error('Failed to fetch user ID');
-                const { UserId } = await userIdRes.json();
+
+                if (userIdRes.status === 401) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (!userIdRes.ok) {
+                    throw new Error(`Failed to fetch user ID: ${userIdRes.statusText}`);
+                }
+
+                const responseData = await userIdRes.json();
+                console.log("Full user ID response:", responseData);
+                const UserId = responseData.UserId || responseData.userId || responseData.Id;
+
+                if (!UserId) {
+                    console.error("User ID not found in response. Full response:", responseData);
+                    throw new Error('User ID not found in response');
+                }
 
                 // Fetch user details using the retrieved user ID
                 const userRes = await fetch(`http://176.9.37.136:5001/api/Users/${UserId}`);
@@ -38,6 +62,9 @@ function SensorData() {
                 }
             } catch (error) {
                 console.error('Error in fetching process:', error);
+                if (error.message.includes('401')) {
+                    window.location.href = '/login';
+                }
             }
         };
 

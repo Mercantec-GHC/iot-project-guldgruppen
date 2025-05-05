@@ -33,16 +33,17 @@ function SignUp() {
                 body: JSON.stringify(userData),
             });
 
+            const data = await response.json();
             if (response.ok) {
                 setMessage('User created successfully!');
                 setUsername('');
                 setEmail('');
                 setPassword('');
             } else {
-                setMessage('Error creating user. Please try again.');
+                setMessage(data.message || 'Error creating user. Please try again.');
             }
         } catch (error) {
-            setMessage('Error: ' + error.message);
+            setMessage('Network error: ' + error.message);
         }
     };
 

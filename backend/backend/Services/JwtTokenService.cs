@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using backend.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -17,9 +18,10 @@ public class JwtTokenService
 
     public string GenerateToken(string email)
     {
-        var claims = new List<Claim>
+        var claims = new[]
         {
-            new Claim(ClaimTypes.Email, email)
+            new Claim(ClaimTypes.Name, email),
+            // other claims if needed
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));

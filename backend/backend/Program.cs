@@ -1,39 +1,63 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using backend.Repositories;
 using backend.Services;
-using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure server URLs
 builder.WebHost.UseUrls("http://0.0.0.0:5001");
 
+// Add database context
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add services
 builder.Services.AddScoped<ISensorRepository, SensorRepository>();
+builder.Services.AddScoped<JwtTokenService>();
 
+// Add controllers
 builder.Services.AddControllers();
-builder.Services.AddScoped<JwtTokenService>(); // Register JwtTokenService
+
+// Configure JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"])),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+// Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin()
+    options.AddPolicy("AllowAll", builder => 
+        builder.WithOrigins("http://localhost:5173", "http://176.9.37.136:5173")
+            .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
+            .AllowCredentials());
 });
 
+// Add Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Configure the HTTP request pipeline
+app.UseSwagger();
+app.UseSwaggerUI();
 
+// Logging middleware
 app.Use(async (context, next) =>
 {
     var remoteIp = context.Connection.RemoteIpAddress;
@@ -42,8 +66,16 @@ app.Use(async (context, next) =>
     Console.WriteLine($"Response: {context.Response.StatusCode}");
 });
 
-app.UseHttpsRedirection();
-app.UseCors();
+// HTTPS redirection (only in production)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+// Middleware ordering is important!
+app.UseRouting();
+app.UseCors("AllowAll");
+app.UseAuthentication(); // Must come before Authorization
 app.UseAuthorization();
 app.MapControllers();
 

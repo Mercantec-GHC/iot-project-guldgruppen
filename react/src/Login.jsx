@@ -1,31 +1,74 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext';
-
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
     const { setIsAuthenticated } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(''); // Clear previous errors
+        setIsLoading(true);
+
         try {
             const response = await fetch('http://176.9.37.136:5001/api/Auth/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({ email, password }),
             });
 
+            const data = await response.json();
+
             if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('token', data.Token);
+                const token = data.token || data.Token; // Handle both cases
+                if (!token) {
+                    throw new Error('No token received');
+                }
+
+                // Store token and set auth state
+                localStorage.setItem('token', token);
                 setIsAuthenticated(true);
+
+                // Immediately verify the token works
+                try {
+                    console.log("Received token:", token);
+                    const verifyRes = await fetch('http://176.9.37.136:5001/api/Auth/userid', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include' // Add this if using cookies
+                    });
+                    console.log("Verification response status:", verifyRes.status);
+
+                    if (!verifyRes.ok) {
+                        throw new Error('Token verification failed');
+                    }
+
+                    // If verification succeeds, navigate to home
+                    navigate('/');
+                } catch (verifyErr) {
+                    localStorage.removeItem('token');
+                    setIsAuthenticated(false);
+                    setError('Login verification failed. Please try again.');
+                    console.error('Token verification error:', verifyErr);
+                }
             } else {
-                throw new Error('Login failed');
+                throw new Error(data.message || 'Login failed');
             }
         } catch (err) {
-            setError('Invalid credentials. Please try again.');
+            setError(err.message || 'Invalid credentials. Please try again.');
+            console.error('Login error:', err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -40,6 +83,7 @@ function Login() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        disabled={isLoading}
                     />
                 </div>
                 <div className="form-group">
@@ -49,9 +93,12 @@ function Login() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        disabled={isLoading}
                     />
                 </div>
-                <button type="submit">Login</button>
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Logging in...' : 'Login'}
+                </button>
             </form>
             {error && <p className="error">{error}</p>}
         </div>
