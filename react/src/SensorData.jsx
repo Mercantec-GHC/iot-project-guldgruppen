@@ -135,7 +135,7 @@ function SensorData() {
                     />
                 </div>
             </div>
-            <p>Motion: {sensorData.motionDetected ? 'Yes' : 'No'}</p>
+            {/*<p>Motion: {sensorData.motionDetected ? 'Yes' : 'No'}</p>*/}
         </div>
     );
 }
