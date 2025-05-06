@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import './Login.css'; // Make sure you have this CSS file for styling
 
 function Login() {
     const { setIsAuthenticated } = useAuth();
@@ -101,6 +102,9 @@ function Login() {
                 </button>
             </form>
             {error && <p className="error">{error}</p>}
+            <div className="signup-link">
+                <p>Don't have an account? <Link to="/signup">Sign up here</Link>.</p>
+            </div>
         </div>
     );
 }

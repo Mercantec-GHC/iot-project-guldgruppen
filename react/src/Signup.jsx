@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './SignUp.css';
+import { Link } from 'react-router-dom';
 
 function SignUp() {
     const [username, setUsername] = useState('');
@@ -35,7 +36,11 @@ function SignUp() {
 
             const data = await response.json();
             if (response.ok) {
-                setMessage('User created successfully!');
+                setMessage('User created successfully! Redirecting to login...');
+                setTimeout(() => {
+                    window.location.href = '/login'; // Or use navigate if you prefer
+                }, 2000);
+                // Reset form fields
                 setUsername('');
                 setEmail('');
                 setPassword('');
@@ -94,6 +99,9 @@ function SignUp() {
             </form>
 
             {message && <p>{message}</p>}
+            <div className="login-link">
+                <p>Already have an account? <Link to="/login">Log in here</Link>.</p>
+            </div>
         </div>
     );
 }
