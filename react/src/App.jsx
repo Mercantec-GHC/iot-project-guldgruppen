@@ -6,6 +6,11 @@ import { useAuth } from './AuthContext';
 
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated } = useAuth();
+
+    if (isAuthenticated === null) {
+        return <div className="loading-spinner">Loading...</div>;
+    }
+
     return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
