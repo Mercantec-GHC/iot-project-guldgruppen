@@ -12,6 +12,7 @@ public class User
     public string Email { get; set; }
     
     public string ArduinoId { get; set; }  
+    public string PhoneNumber { get; set; }
 }
 
 public class UserDTO
@@ -22,6 +23,7 @@ public class UserDTO
     public string Email { get; set; }
     
     public string ArduinoId { get; set; }  
+    public string PhoneNumber { get; set; }
 }
 
 public class UserDtoRegister
@@ -30,6 +32,7 @@ public class UserDtoRegister
     public string Email { get; set; }
     public string Password { get; set; }
     public string ArduinoId { get; set; }
+    public string PhoneNumber { get; set; }
 }
 
 public class UserDtoLogin

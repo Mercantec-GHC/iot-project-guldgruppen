@@ -6,6 +6,7 @@ function SignUp() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [region, setRegion] = useState('Copenhagen');
     const [message, setMessage] = useState('');
 
@@ -26,7 +27,8 @@ function SignUp() {
             username,
             email,
             password,
-            arduinoId
+            arduinoId,
+            phoneNumber
         };
 
         try {
@@ -48,6 +50,7 @@ function SignUp() {
                 setUsername('');
                 setEmail('');
                 setPassword('');
+                setPhoneNumber('');
             } else {
                 setMessage(data.message || 'Error creating user. Please try again.');
             }
@@ -86,6 +89,17 @@ function SignUp() {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label>Phone Number (with country code)</label>
+                    <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="+4512345678"
                         required
                     />
                 </div>

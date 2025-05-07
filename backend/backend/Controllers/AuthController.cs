@@ -35,6 +35,7 @@ public class AuthController : ControllerBase
             Username = request.Username,
             Email = request.Email,
             ArduinoId = request.ArduinoId,
+            PhoneNumber = request.PhoneNumber,
             PasswordHash = Convert.ToBase64String(passwordHash),
             PasswordSalt = Convert.ToBase64String(passwordSalt)
         };
