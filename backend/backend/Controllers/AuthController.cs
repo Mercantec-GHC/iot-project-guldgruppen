@@ -58,7 +58,7 @@ public class AuthController : ControllerBase
         }
 
         string token = _jwtTokenService.GenerateToken(user.Email);
-        return Ok(new { token = token }); // Use lowercase 'token' for consistency
+        return Ok(new { token = token });
     }
 
     private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -94,9 +94,8 @@ public class AuthController : ControllerBase
 
         Console.WriteLine($"Authenticated user: {User.Identity.Name}");
         
-        // Extract the email from the JWT token
         var email = User?.Identity?.Name;
-        Console.WriteLine($"Email from token: {email}"); // Debug logging
+        Console.WriteLine($"Email from token: {email}");
 
         if (string.IsNullOrEmpty(email))
         {
@@ -105,7 +104,7 @@ public class AuthController : ControllerBase
 
         // Find the user by email
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        Console.WriteLine($"Found user ID: {user?.id}"); // Debug logging
+        Console.WriteLine($"Found user ID: {user?.id}");
 
         if (user == null)
         {

@@ -14,9 +14,13 @@ function SignUp() {
 
         const arduinoId = region === 'Copenhagen'
             ? '123e4567-e89b-12d3-a456-426614174000'
-            : region === 'Skive'
+            : region === 'Skive1'
                 ? '123e4567-e89b-12d3-a456-426614174001'
-                : '123e4567-e89b-12d3-a456-426614174002';
+                : region === 'Skive2'
+                    ? '123e4567-e89b-12d3-a456-426614174002'
+                    : region === 'Aalborg'
+                        ? '123e4567-e89b-12d3-a456-426614174003'
+                        : '';
 
         const userData = {
             username,
@@ -26,7 +30,7 @@ function SignUp() {
         };
 
         try {
-            const response = await fetch('http://176.9.37.136:5001/api/Auth/register', {
+            const response = await fetch('http://localhost:5001/api/Auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -38,7 +42,7 @@ function SignUp() {
             if (response.ok) {
                 setMessage('User created successfully! Redirecting to login...');
                 setTimeout(() => {
-                    window.location.href = '/login'; // Or use navigate if you prefer
+                    window.location.href = '/login';
                 }, 2000);
                 // Reset form fields
                 setUsername('');
@@ -90,7 +94,8 @@ function SignUp() {
                     <label>Select the Office Location You Wish to Receive Environmental Sensor Data From</label>
                     <select value={region} onChange={(e) => setRegion(e.target.value)}>
                         <option value="Copenhagen">Copenhagen</option>
-                        <option value="Skive">Skive</option>
+                        <option value="Skive1">Skive1</option>
+                        <option value="Skive2">Skive2</option>
                         <option value="Aalborg">Aalborg</option>
                     </select>
                 </div>

@@ -16,7 +16,7 @@ function SensorData() {
                 }
 
                 // Fetch the user ID from the Auth endpoint
-                const userIdRes = await fetch('http://176.9.37.136:5001/api/Auth/userid', {
+                const userIdRes = await fetch('http://localhost:5001/api/Auth/userid', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -45,7 +45,7 @@ function SensorData() {
                 }
 
                 // Fetch user details using the retrieved user ID
-                const userRes = await fetch(`http://176.9.37.136:5001/api/Users/${UserId}`);
+                const userRes = await fetch(`http://localhost:5001/api/Users/${UserId}`);
                 if (!userRes.ok) throw new Error('Failed to fetch user');
                 const userData = await userRes.json();
 
@@ -53,7 +53,7 @@ function SensorData() {
                 setArduinoId(userArduinoId);
 
                 // Fetch sensor data using the Arduino ID
-                const sensorRes = await fetch(`http://176.9.37.136:5001/api/Sensor/${userArduinoId}`);
+                const sensorRes = await fetch(`http://localhost:5001/api/Sensor/${userArduinoId}`);
                 if (!sensorRes.ok) throw new Error('Failed to fetch sensor data');
                 const sensorArray = await sensorRes.json();
 
@@ -135,7 +135,6 @@ function SensorData() {
                     />
                 </div>
             </div>
-            <p>Motion: {sensorData.motionDetected ? 'Yes' : 'No'}</p>
         </div>
     );
 }

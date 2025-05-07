@@ -13,11 +13,11 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(''); // Clear previous errors
+        setError('');
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://176.9.37.136:5001/api/Auth/login', {
+            const response = await fetch('http://localhost:5001/api/Auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -28,25 +28,23 @@ function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                const token = data.token || data.Token; // Handle both cases
+                const token = data.token || data.Token;
                 if (!token) {
                     throw new Error('No token received');
                 }
 
-                // Store token and set auth state
                 localStorage.setItem('token', token);
                 setIsAuthenticated(true);
 
-                // Immediately verify the token works
                 try {
                     console.log("Received token:", token);
-                    const verifyRes = await fetch('http://176.9.37.136:5001/api/Auth/userid', {
+                    const verifyRes = await fetch('http://localhost:5001/api/Auth/userid', {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         },
-                        credentials: 'include' // Add this if using cookies
+                        credentials: 'include'
                     });
                     console.log("Verification response status:", verifyRes.status);
 
@@ -54,7 +52,6 @@ function Login() {
                         throw new Error('Token verification failed');
                     }
 
-                    // If verification succeeds, navigate to home
                     navigate('/');
                 } catch (verifyErr) {
                     localStorage.removeItem('token');

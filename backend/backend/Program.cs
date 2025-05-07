@@ -72,10 +72,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-// Middleware ordering is important!
 app.UseRouting();
 app.UseCors("AllowAll");
-app.UseAuthentication(); // Must come before Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
