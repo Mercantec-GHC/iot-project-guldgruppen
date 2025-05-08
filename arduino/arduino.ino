@@ -102,11 +102,9 @@ void setup() {
 
         Serial.println("\nConnected to WiFi using saved credentials!");
         connected = true;
-
       } else {
 
         Serial.println("\nFailed to connect using saved credentials.");
-
       }
     }
   }
@@ -118,7 +116,6 @@ void setup() {
     Serial.print("AP IP Address: ");
     Serial.println(WiFi.localIP());
     server.begin();
-
   }
 }
  
@@ -131,7 +128,6 @@ void loop() {
   } else {
 
     runMainLogic();
-
   }
 }
  
@@ -144,7 +140,7 @@ void handleSetupPortal() {
     Serial.println("Client connected for setup");
     String request = client.readStringUntil('\r');
     Serial.println(request);
-
+    
     client.flush();
  
     if (request.indexOf("/save?") != -1) {
