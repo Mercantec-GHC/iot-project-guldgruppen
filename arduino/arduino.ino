@@ -3,23 +3,23 @@
 #include <FlashStorage.h>
 #include <ArduinoHttpClient.h>
 #include <Arduino_MKRIoTCarrier.h>
-
  
-#include "TemperatureSensor.h"
-#include "MoistureSensor.h"
-#include "PIRSensor.h"
-
-
 MKRIoTCarrier carrier;
-
  
+// === Configuration ===
 #define USE_HARDCODED_WIFI true
-const char* HARDCODED_SSID = "Zyxel_BA2F";
-const char* HARDCODED_PASS = "G7QLB4EAMY";
+const char* HARDCODED_SSID = "NOKIA-9791";
+const char* HARDCODED_PASS = "ET6YVtZN4U";
+char serverAddress[] = "192.168.0.250";
+int serverPort = 5001;
+const char* arduinoId = "123e4567-e89b-12d3-a456-426614174003";
+const unsigned long postInterval = 1000;  // 1 second
  
 WiFiServer server(80);
+WiFiClient wifi;
+HttpClient client(wifi, serverAddress, serverPort);
+unsigned long lastPostTime = 0;
  
-// Struct to store WiFi credentials
 typedef struct {
   char ssid[32];
   char pass[64];
@@ -27,29 +27,15 @@ typedef struct {
  
 FlashStorage(wifiCredsStore, WiFiCredentials);
  
-// Server settings
-char serverAddress[] = "192.168.1.234";
-int serverPort = 5001;
- 
-// Unique Arduino GUID
-const char* arduinoId = "123e4567-e89b-12d3-a456-426614174001";
- 
-WiFiClient wifi;
-HttpClient client(wifi, serverAddress, serverPort);
- 
-// Timing
-unsigned long lastPostTime = 0;
-const unsigned long postInterval = 1000;
- 
+// === Setup ===
 void setup() {
   Serial.begin(9600);
   carrier.noCase();
   carrier.begin();
-  delay(2000); // Wait for Serial monitor
+  delay(2000);
  
-  setupTemperatureSensor();
-  setupMoistureSensor();
-  setupPIRSensor();
+  pinMode(A2, INPUT);  // PIR sensor
+  // Moisture sensor on A1 (default analog read — no setup needed)
  
   bool connected = false;
  
@@ -58,11 +44,9 @@ void setup() {
     Serial.println(HARDCODED_SSID);
     WiFi.begin(HARDCODED_SSID, HARDCODED_PASS);
  
-    int attempt = 0;
-    while (WiFi.status() != WL_CONNECTED && attempt < 10) {
+    for (int i = 0; i < 10 && WiFi.status() != WL_CONNECTED; i++) {
       delay(1000);
       Serial.print(".");
-      attempt++;
     }
  
     if (WiFi.status() == WL_CONNECTED) {
@@ -75,17 +59,12 @@ void setup() {
  
   if (!connected) {
     WiFiCredentials creds = wifiCredsStore.read();
- 
     if (strlen(creds.ssid) > 0 && strlen(creds.pass) > 0) {
-      Serial.print("Connecting to saved WiFi: ");
-      Serial.println(creds.ssid);
       WiFi.begin(creds.ssid, creds.pass);
  
-      int attempt = 0;
-      while (WiFi.status() != WL_CONNECTED && attempt < 10) {
+      for (int i = 0; i < 10 && WiFi.status() != WL_CONNECTED; i++) {
         delay(1000);
         Serial.print(".");
-        attempt++;
       }
  
       if (WiFi.status() == WL_CONNECTED) {
@@ -106,6 +85,7 @@ void setup() {
   }
 }
  
+// === Main Loop ===
 void loop() {
   if (WiFi.status() == WL_AP_LISTENING || WiFi.status() == WL_AP_CONNECTED) {
     handleSetupPortal();
@@ -114,12 +94,11 @@ void loop() {
   }
 }
  
+// === Web Setup Portal ===
 void handleSetupPortal() {
   WiFiClient client = server.available();
   if (client) {
-    Serial.println("Client connected for setup");
     String request = client.readStringUntil('\r');
-    Serial.println(request);
     client.flush();
  
     if (request.indexOf("/save?") != -1) {
@@ -137,7 +116,7 @@ void handleSetupPortal() {
         client.println();
         client.println("<h1>Saved! Rebooting...</h1>");
         delay(2000);
-        NVIC_SystemReset(); // Soft reset
+        NVIC_SystemReset();
       }
     } else {
       client.println("HTTP/1.1 200 OK");
@@ -163,10 +142,11 @@ String getParam(String request, String key) {
   return request.substring(start, end);
 }
  
+// === Sensor Logic ===
 void runMainLogic() {
-  float temperature = carrier.Env.readTemperature();
-  bool motionDetected = carrier.Env.readMotion();
-  int moisture = carrier.Env.readMoistureLevel();
+  float temperature = carrier.Env.readTemperature();  // replaced ENV with carrier.Env
+  bool motionDetected = digitalRead(A2) == HIGH;
+  int moisture = analogRead(A1);
  
   unsigned long currentTime = millis();
   if (currentTime - lastPostTime >= postInterval) {
@@ -175,6 +155,7 @@ void runMainLogic() {
   }
 }
  
+// === HTTP POST ===
 void sendSensorData(float temperature, bool motionDetected, int moisture) {
   String postData = "{\"arduinoId\":\"" + String(arduinoId) + "\"," +
                     "\"temperature\":" + String(temperature, 2) +
