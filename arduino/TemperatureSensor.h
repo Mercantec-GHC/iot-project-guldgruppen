@@ -7,6 +7,6 @@ void setupTemperatureSensor() {
   }
 }
 
-float readTemperature() {
+float carrier.Env.readTemperature() {
   return ENV.readTemperature();
 }

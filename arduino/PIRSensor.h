@@ -4,6 +4,6 @@ void setupPIRSensor() {
   pinMode(PIR_PIN, INPUT);
 }
 
-bool readMotion() {
+bool carrier.Env.readMotion() {
   return digitalRead(PIR_PIN) == HIGH;
 }

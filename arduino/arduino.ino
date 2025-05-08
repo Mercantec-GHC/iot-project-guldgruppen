@@ -2,10 +2,16 @@
 #include <WiFiServer.h>
 #include <FlashStorage.h>
 #include <ArduinoHttpClient.h>
+#include <Arduino_MKRIoTCarrier.h>
+
  
 #include "TemperatureSensor.h"
 #include "MoistureSensor.h"
 #include "PIRSensor.h"
+
+
+MKRIoTCarrier carrier;
+
  
 #define USE_HARDCODED_WIFI true
 const char* HARDCODED_SSID = "Zyxel_BA2F";
@@ -37,6 +43,8 @@ const unsigned long postInterval = 1000;
  
 void setup() {
   Serial.begin(9600);
+  carrier.noCase();
+  carrier.begin();
   delay(2000); // Wait for Serial monitor
  
   setupTemperatureSensor();
@@ -156,9 +164,9 @@ String getParam(String request, String key) {
 }
  
 void runMainLogic() {
-  float temperature = readTemperature();
-  bool motionDetected = readMotion();
-  int moisture = readMoistureLevel();
+  float temperature = carrier.Env.readTemperature();
+  bool motionDetected = carrier.Env.readMotion();
+  int moisture = carrier.Env.readMoistureLevel();
  
   unsigned long currentTime = millis();
   if (currentTime - lastPostTime >= postInterval) {
