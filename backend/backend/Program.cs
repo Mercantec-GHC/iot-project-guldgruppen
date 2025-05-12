@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using backend.Repositories;
 using backend.Services;
 using System.Text;
+using backend.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,9 @@ builder.Services.AddScoped<JwtTokenService>();
 
 // Add controllers
 builder.Services.AddControllers();
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddTransient<IMailService, MailService>();
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

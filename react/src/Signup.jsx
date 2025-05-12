@@ -64,38 +64,45 @@ function SignUp() {
             <h2>Sign Up</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label>Username</label>
+                    <label htmlFor="username">Username</label>
                     <input
+                        id="username"
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Choose a username"
                         required
                     />
                 </div>
 
                 <div className="form-group">
-                    <label>Email</label>
+                    <label htmlFor="email">Email</label>
                     <input
+                        id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email address"
                         required
                     />
                 </div>
 
                 <div className="form-group">
-                    <label>Password</label>
+                    <label htmlFor="password">Password</label>
                     <input
+                        id="password"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Create a secure password"
                         required
                     />
                 </div>
 
                 <div className="form-group">
-                    <label>Phone Number (with country code)</label>
+                    <label htmlFor="phoneNumber">Phone Number (with country code)</label>
                     <input
+                        id="phoneNumber"
                         type="tel"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
@@ -105,8 +112,12 @@ function SignUp() {
                 </div>
 
                 <div className="form-group">
-                    <label>Select the Office Location You Wish to Receive Environmental Sensor Data From</label>
-                    <select value={region} onChange={(e) => setRegion(e.target.value)}>
+                    <label htmlFor="region">Select Office Location for Sensor Data</label>
+                    <select
+                        id="region"
+                        value={region}
+                        onChange={(e) => setRegion(e.target.value)}
+                    >
                         <option value="Copenhagen">Copenhagen</option>
                         <option value="Skive1">Skive1</option>
                         <option value="Skive2">Skive2</option>

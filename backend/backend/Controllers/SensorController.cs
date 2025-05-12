@@ -96,8 +96,6 @@ public class SensorController : ControllerBase
             return BadRequest("Invalid ArduinoId.");
         }
 
-        //await _repository.DeleteIfExistsAsync(dto.ArduinoId);
-
         var reading = new SensorReading
         {
             ArduinoId = dto.ArduinoId,

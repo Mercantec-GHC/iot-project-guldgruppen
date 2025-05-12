@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SensorData from './SensorData';
 import SignUp from './SignUp';
 import Login from './Login';
+import Settings from './Settings';
 import { useAuth } from './AuthContext';
 
 const ProtectedRoute = ({ children }) => {
@@ -28,6 +29,14 @@ function App() {
                 />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/login" element={<Login />} />
+                <Route
+                    path="/settings"
+                    element={
+                        <ProtectedRoute>
+                            <Settings />
+                        </ProtectedRoute>
+                    }
+                />
             </Routes>
         </BrowserRouter>
     );

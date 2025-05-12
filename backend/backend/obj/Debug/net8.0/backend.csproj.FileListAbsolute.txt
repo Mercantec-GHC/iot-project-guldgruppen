@@ -724,3 +724,8 @@ G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin
 G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\MailKit.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\MimeKit.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll

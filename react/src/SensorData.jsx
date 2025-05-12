@@ -1,11 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GaugeComponent from 'react-gauge-component';
+import { useAuth } from './AuthContext';
 import './SensorData.css';
 
 
 function SensorData() {
     const [sensorData, setSensorData] = useState({ temperature: 0, moistureLevel: 0, motionDetected: false });
     const [arduinoId, setArduinoId] = useState(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const navigate = useNavigate();
+    const { logout } = useAuth();
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownOpen(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [dropdownRef]);
 
     useEffect(() => {
         const fetchUserAndSensorData = async () => {
@@ -74,9 +94,34 @@ function SensorData() {
         return () => clearInterval(interval);
     }, []);
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    const handleSettings = () => {
+        navigate('/settings');
+    };
+
     return (
         <div>
-            <h1>Room Sensor Data</h1>
+            <div className="header">
+                <h1>Room Sensor Data</h1>
+                <div className="dropdown-container" ref={dropdownRef}>
+                    <button
+                        className="dropdown-button"
+                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                        ☰
+                    </button>
+                    {dropdownOpen && (
+                        <div className="dropdown-menu">
+                            <button onClick={handleSettings}>Settings</button>
+                            <button onClick={handleLogout}>Logout</button>
+                        </div>
+                    )}
+                </div>
+            </div>
             {arduinoId ? (
                 <p>Fetching data for Arduino ID: <strong>{arduinoId}</strong></p>
             ) : (

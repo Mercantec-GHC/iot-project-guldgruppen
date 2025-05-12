@@ -115,4 +115,50 @@ public class AuthController : ControllerBase
         // Return the user ID
         return Ok(new { UserId = user.id });
     }
+    
+    [Authorize]
+    [HttpPost("update-email")]
+    public async Task<IActionResult> UpdateEmail([FromBody] UserDtoUpdateEmail request)
+    {
+        // Get the current user's email from the JWT token
+        var currentEmail = User?.Identity?.Name;
+        if (string.IsNullOrEmpty(currentEmail))
+        {
+            return Unauthorized("Invalid token or user not authenticated.");
+        }
+
+        // Find the user
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == currentEmail);
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
+
+        // Verify current password
+        if (!VerifyPasswordHash(request.CurrentPassword, 
+                Convert.FromBase64String(user.PasswordHash), 
+                Convert.FromBase64String(user.PasswordSalt)))
+        {
+            return Unauthorized("Current password is incorrect.");
+        }
+
+        // Check if new email is already in use
+        if (await _context.Users.AnyAsync(u => u.Email == request.NewEmail))
+        {
+            return BadRequest("The new email is already in use.");
+        }
+
+        // Update the email
+        user.Email = request.NewEmail;
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        // Generate a new token with the updated email
+        string token = _jwtTokenService.GenerateToken(user.Email);
+
+        return Ok(new { 
+            message = "Email updated successfully.",
+            token = token 
+        });
+    }
 }
