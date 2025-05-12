@@ -2,9 +2,8 @@
 
 namespace backend.Services;
 
-// Interface defining the contract for mail services.
 public interface IMailService
 {
-    // Method for sending an email, accepts MailData as input and returns a boolean indicating success or failure.
+    // Metode til at sende en mail- accepterer Maildata som input og returnerer en boolean for at vise success eller fejl.
     bool SendMail(MailData Mail_Data);
 }

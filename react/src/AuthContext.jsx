@@ -3,7 +3,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    // Initialize as null to distinguish between "not checked yet" and "no token"
     const [isAuthenticated, setIsAuthenticated] = useState(null);
 
     useEffect(() => {

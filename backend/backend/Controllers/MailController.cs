@@ -8,20 +8,20 @@ namespace backend.Controllers;
 [Route("[controller]")]
 public class MailController : ControllerBase
 {
-    // Reference to the mail service, used to send emails.
+    // Referance til mail servicen - bruges til at sende mails.
     IMailService Mail_Service = null;
 
-    // Constructor to inject the IMailService dependency, enabling mail functionality.
+    // Constructor til at injekte IMailService dependency - aktiverer mail funktionalitet.
     public MailController(IMailService _MailService)
     {
-        Mail_Service = _MailService;  // Assign the injected mail service to the class-level variable.
+        Mail_Service = _MailService;  // Tildel den injektede mail service til class-level variablen.
     }
 
-    // HTTP POST method to send an email.
+    // HTTP POST metode til at sende en mail.
     [HttpPost]
     public bool SendMail(MailData Mail_Data)
     {
-        // Calls the SendMail method from the injected mail service to send the provided mail data.
+        // Kalder SendMail metoden fra den injektede mail service for at sende den skrevne mail data.
         return Mail_Service.SendMail(Mail_Data);
     }
 }

@@ -103,7 +103,7 @@ public class AuthController : ControllerBase
             return Unauthorized("Invalid token or user not authenticated.");
         }
 
-        // Find the user by email
+        // Find bruger via email
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         Console.WriteLine($"Found user ID: {user?.id}");
 
@@ -112,7 +112,7 @@ public class AuthController : ControllerBase
             return NotFound("User not found.");
         }
 
-        // Return the user ID
+        // Returner user ID
         return Ok(new { UserId = user.id });
     }
     
@@ -120,21 +120,21 @@ public class AuthController : ControllerBase
     [HttpPost("update-email")]
     public async Task<IActionResult> UpdateEmail([FromBody] UserDtoUpdateEmail request)
     {
-        // Get the current user's email from the JWT token
+        // Få den aktuelle brugers email fra JWT token
         var currentEmail = User?.Identity?.Name;
         if (string.IsNullOrEmpty(currentEmail))
         {
             return Unauthorized("Invalid token or user not authenticated.");
         }
 
-        // Find the user
+        // Find brugeren
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == currentEmail);
         if (user == null)
         {
             return NotFound("User not found.");
         }
 
-        // Verify current password
+        // Verificer nuværende password
         if (!VerifyPasswordHash(request.CurrentPassword, 
                 Convert.FromBase64String(user.PasswordHash), 
                 Convert.FromBase64String(user.PasswordSalt)))
@@ -142,18 +142,18 @@ public class AuthController : ControllerBase
             return Unauthorized("Current password is incorrect.");
         }
 
-        // Check if new email is already in use
+        // Tjek om email allerede er i brug
         if (await _context.Users.AnyAsync(u => u.Email == request.NewEmail))
         {
             return BadRequest("The new email is already in use.");
         }
 
-        // Update the email
+        // Opdater email
         user.Email = request.NewEmail;
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 
-        // Generate a new token with the updated email
+        // Generer a new token med den opdaterede email
         string token = _jwtTokenService.GenerateToken(user.Email);
 
         return Ok(new { 

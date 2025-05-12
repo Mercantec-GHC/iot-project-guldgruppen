@@ -21,7 +21,6 @@ public class JwtTokenService
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, email),
-            // other claims if needed
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));

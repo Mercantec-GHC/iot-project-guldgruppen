@@ -13,7 +13,7 @@ function SensorData() {
     const navigate = useNavigate();
     const { logout } = useAuth();
 
-    // Close dropdown when clicking outside
+    // Luk dropdown når der klikkes udenfor
     useEffect(() => {
         function handleClickOutside(event) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -35,7 +35,7 @@ function SensorData() {
                     throw new Error('No token found');
                 }
 
-                // Fetch the user ID from the Auth endpoint
+                // Fetch user ID via Auth endpoint
                 const userIdRes = await fetch('http://localhost:5001/api/Auth/userid', {
                     method: 'GET',
                     headers: {
@@ -64,7 +64,7 @@ function SensorData() {
                     throw new Error('User ID not found in response');
                 }
 
-                // Fetch user details using the retrieved user ID
+                // Fetch user details ved hjælp af det fetchede user ID
                 const userRes = await fetch(`http://localhost:5001/api/Users/${UserId}`);
                 if (!userRes.ok) throw new Error('Failed to fetch user');
                 const userData = await userRes.json();
@@ -72,7 +72,7 @@ function SensorData() {
                 const userArduinoId = userData.arduinoId;
                 setArduinoId(userArduinoId);
 
-                // Fetch sensor data using the Arduino ID
+                // Fetch sensor data via Arduino ID
                 const sensorRes = await fetch(`http://localhost:5001/api/Sensor/${userArduinoId}`);
                 if (!sensorRes.ok) throw new Error('Failed to fetch sensor data');
                 const sensorArray = await sensorRes.json();

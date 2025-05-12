@@ -125,7 +125,7 @@ button:disabled {
     color: #222;
 }
 
-/* Responsive styles */
+/* Responsive stil */
 @media (max-width: 480px) {
     .login-container {
         max-width: 100%;
@@ -150,7 +150,7 @@ button:disabled {
     }
 }
 
-/* Settings page styles */
+/* Settings page stil */
 .settings-section {
     background-color: #f9f9f9;
     border-radius: 8px;
