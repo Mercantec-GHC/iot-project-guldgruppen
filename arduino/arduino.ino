@@ -27,7 +27,7 @@ WiFiClient wifi;
 HttpClient client(wifi, serverAddress, serverPort);
 
 unsigned long lastPostTime = 0;
-const unsigned long postInterval = 1000; // 5 seconds
+const unsigned long postInterval = 1000;
 
 const int MOISTURE_PIN = A1;
 const int PIR_PIN = A5;
