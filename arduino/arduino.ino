@@ -5,8 +5,8 @@
 #include <Arduino_MKRENV.h>
 
 #define USE_HARDCODED_WIFI true
-const char* HARDCODED_SSID = "Zyxel_BA2F";
-const char* HARDCODED_PASS = "G7QLB4EAMY";
+const char* HARDCODED_SSID = "iPhone";
+const char* HARDCODED_PASS = "mysamus123";
 
 WiFiServer server(80);
 
@@ -20,11 +20,11 @@ typedef struct {
 FlashStorage(wifiCredsStore, WiFiCredentials);
 
 // Server indstillinger
-char serverAddress[] = "192.168.1.234";
+char serverAddress[] = "172.20.10.2";
 int serverPort = 5001;
 
 // Unikt ID for Arduino'en
-const char* arduinoId = "123e4567-e89b-12d3-a456-426614174001";
+const char* arduinoId = "123e4567-e89b-12d3-a456-426614174000";
 
 WiFiClient wifi;
 HttpClient client(wifi, serverAddress, serverPort);
