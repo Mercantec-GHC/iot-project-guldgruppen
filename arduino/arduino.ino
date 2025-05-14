@@ -8,8 +8,8 @@ MKRIoTCarrier carrier; // Carrier board objekt til sensorer og display
 
 // WiFi indstillinger - kan bruge hardcodede eller gemte credentials
 #define USE_HARDCODED_WIFI true
-const char* HARDCODED_SSID = "Zyxel_BA2F";
-const char* HARDCODED_PASS = "G7QLB4EAMY";
+const char* HARDCODED_SSID = "iPhone";
+const char* HARDCODED_PASS = "mysamus123";
 
 WiFiServer server(80); // Opret en server på port 80
 
@@ -23,11 +23,11 @@ typedef struct {
 FlashStorage(wifiCredsStore, WiFiCredentials);
 
 // Server indstillinger for backend kommunikation
-char serverAddress[] = "192.168.1.234";
+char serverAddress[] = "172.20.10.2";
 int serverPort = 5001;
 
 // Unikt ID for Arduino'en (simulerer en UUID)
-const char* arduinoId = "123e4567-e89b-12d3-a456-426614174001";
+const char* arduinoId = "123e4567-e89b-12d3-a456-426614174000";
 
 WiFiClient wifi; // WiFi klient objekt
 HttpClient client(wifi, serverAddress, serverPort); // HTTP klient
@@ -73,6 +73,33 @@ void setup() {
       delay(1000);
       Serial.print(".");
     }
+
+      // Display rotation
+  carrier.display.setRotation(0); // Rotation 0 eller 1,2,3 (90, 180, 270 grader)
+
+  // Baggrundsfarve
+  carrier.display.fillScreen(0x001F); 
+
+  //tekst farve
+  carrier.display.setTextColor(0xFFFF); 
+
+  // tekst størrelse
+  carrier.display.setTextSize(2); 
+  
+  // Position af tekst
+  carrier.display.setCursor(20, 70);
+  carrier.display.print("Climate Control");
+
+  carrier.display.setCursor(50, 90);
+  carrier.display.print("Sensor CPH");
+  
+  carrier.display.setCursor(20, 130);
+  carrier.display.print("Send mail press 0");
+
+  carrier.display.setCursor(20, 150);
+  carrier.display.print("Show data press 1");
+
+  
   }
 
   // Hvis ikke forbundet, prøv gemte credentials fra flash
@@ -125,6 +152,71 @@ void loop() {
   // Hvis der trykkes på TOUCH0, send anmodning om sensorlæsning
   if (carrier.Buttons.onTouchDown(TOUCH0)) {
     sendSensorReadingRequest(arduinoId);
+
+    //Display success tekst
+    carrier.display.fillScreen(0x07E0); 
+    carrier.display.setTextColor(0xFFFF); 
+    carrier.display.setTextSize(2); 
+    carrier.display.setCursor(50, 70);
+    carrier.display.print("Mail Send");
+    carrier.display.setCursor(50, 110);
+    carrier.display.print("Successfully!");
+    delay(2000);
+
+    //Tilbage til Home screen
+    carrier.display.fillScreen(0x001F);  
+    carrier.display.setCursor(20, 70);
+    carrier.display.print("Climate Control");
+
+    carrier.display.setCursor(50, 90);
+    carrier.display.print("Sensor CPH");
+    
+    carrier.display.setCursor(20, 130);
+    carrier.display.print("Send mail press 0");
+
+    carrier.display.setCursor(20, 150);
+    carrier.display.print("Show data press 1");
+
+
+  }
+
+    // Hvis der trykkes på TOUCH1, vis temperatur og fugtighed
+  if (carrier.Buttons.onTouchDown(TOUCH1)) {
+    // Læs sensordata
+    float temperature = carrier.Env.readTemperature();
+    int moisture = map(analogRead(MOISTURE_PIN), 1023, 0, 0, 100);
+    moisture = constrain(moisture, 0, 100);
+
+    // Vis data på display
+    carrier.display.fillScreen(0x0000);  
+    carrier.display.setTextColor(0xFFFF); 
+    carrier.display.setTextSize(2); 
+
+    carrier.display.setCursor(30, 60);
+    carrier.display.print("Temp: ");
+    carrier.display.print(temperature);
+    carrier.display.print(" C");
+
+    carrier.display.setCursor(30, 100);
+    carrier.display.print("Moisture: ");
+    carrier.display.print(moisture);
+    carrier.display.print(" %");
+
+    delay(4000);  // Vis data i 4 sekunder
+
+    // Tilbage til Home screen
+    carrier.display.fillScreen(0x001F);  
+    carrier.display.setCursor(20, 70);
+    carrier.display.print("Climate Control");
+
+    carrier.display.setCursor(50, 90);
+    carrier.display.print("Sensor CPH");
+
+    carrier.display.setCursor(20, 130);
+    carrier.display.print("Send mail press 0");
+
+    carrier.display.setCursor(20, 150);
+    carrier.display.print("Show data press 1");
   }
 
   // Send sensordata med jævne mellemrum
