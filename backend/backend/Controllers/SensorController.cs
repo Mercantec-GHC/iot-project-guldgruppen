@@ -1,5 +1,6 @@
 ﻿using backend.Models;
 using backend.Repositories;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,11 +12,13 @@ public class SensorController : ControllerBase
 {
     private readonly ISensorRepository _repository;
     private readonly AppDbContext _context;
+    private readonly IMailService _mailService;
 
-    public SensorController(ISensorRepository repository, AppDbContext context)
+    public SensorController(ISensorRepository repository, AppDbContext context, IMailService mailService)
     {
         _repository = repository;
         _context = context;
+        _mailService = mailService;
     }
 
     private async Task<bool> IsValidArduinoId(string arduinoId)
@@ -49,6 +52,14 @@ public class SensorController : ControllerBase
             return BadRequest("Invalid ArduinoId.");
         }
 
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.ArduinoId == dto.ArduinoId);
+
+        if (user == null)
+        {
+            return BadRequest("No user found for this ArduinoId.");
+        }
+
         var reading = new SensorReading
         {
             ArduinoId = dto.ArduinoId,
@@ -56,6 +67,40 @@ public class SensorController : ControllerBase
             Timestamp = DateTime.UtcNow
         };
         await _repository.UpsertAsync(reading);
+
+        if (dto.MotionDetected && user.SendEmailAlert)
+        {
+            // Tjek om der er gået nok tid siden sidste alert
+            var timeSinceLastAlert = DateTime.UtcNow - (user.LastMotionAlertSentAt ?? DateTime.MinValue);
+            var alertCooldown = TimeSpan.FromMinutes(5); // 5 minutters cooldown
+        
+            if (timeSinceLastAlert >= alertCooldown)
+            {
+                Console.WriteLine("Attempting to send email notification...");
+                var mailData = new MailData
+                {
+                    EmailToId = user.Email,
+                    EmailToName = user.Username,
+                    EmailSubject = "Movement Detected!",
+                    EmailBody = $"Movement was detected by your sensor (Arduino ID: {dto.ArduinoId}) at {DateTime.UtcNow.ToString("g")}"
+                };
+
+                var emailSent = _mailService.SendMail(mailData);
+                Console.WriteLine($"Email send result: {emailSent}");
+
+                if (emailSent)
+                {
+                    // Update den sidste alert tid kun hvis email blev sendt
+                    user.LastMotionAlertSentAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Alert not sent - cooldown active. Time remaining: {alertCooldown - timeSinceLastAlert}");
+            }
+        }
+
         return Ok();
     }
 
@@ -96,6 +141,14 @@ public class SensorController : ControllerBase
             return BadRequest("Invalid ArduinoId.");
         }
 
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.ArduinoId == dto.ArduinoId);
+
+        if (user == null)
+        {
+            return BadRequest("No user found for this ArduinoId.");
+        }
+
         var reading = new SensorReading
         {
             ArduinoId = dto.ArduinoId,
@@ -105,6 +158,40 @@ public class SensorController : ControllerBase
             Timestamp = DateTime.UtcNow
         };
         await _repository.UpsertAsync(reading);
+
+        if (dto.MotionDetected && user.SendEmailAlert)
+        {
+            // Tjek om der er gået nok tid siden sidste alert
+            var timeSinceLastAlert = DateTime.UtcNow - (user.LastMotionAlertSentAt ?? DateTime.MinValue);
+            var alertCooldown = TimeSpan.FromMinutes(5); // 5 minutters cooldown
+            
+            if (timeSinceLastAlert >= alertCooldown)
+            {
+                Console.WriteLine("Attempting to send email notification from combined reading...");
+                var mailData = new MailData
+                {
+                    EmailToId = user.Email,
+                    EmailToName = user.Username,
+                    EmailSubject = "Movement Detected!",
+                    EmailBody = $"Movement was detected by your sensor (Arduino ID: {dto.ArduinoId}) at {DateTime.UtcNow.ToString("g")}"
+                };
+
+                var emailSent = _mailService.SendMail(mailData);
+                Console.WriteLine($"Email send result: {emailSent}");
+
+                if (emailSent)
+                {
+                    // Update den sidste alert tid kun hvis email blev sendt
+                    user.LastMotionAlertSentAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Alert not sent - cooldown active. Time remaining: {alertCooldown - timeSinceLastAlert}");
+            }
+        }
+
         return Ok();
     }
 }

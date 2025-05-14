@@ -52,4 +52,19 @@ public class UsersController : ControllerBase
 
         return Ok(user);
     }
+    
+    [HttpPut("{id}/set-alerts")]
+    public async Task<IActionResult> UpdateUserAlerts(int id, [FromBody] UpdateAlertsDto updateDto)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        user.SendEmailAlert = updateDto.SendEmailAlert;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

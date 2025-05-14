@@ -10,6 +10,7 @@ function Settings() {
     const [isLoading, setIsLoading] = useState(false);
     const [userEmail, setUserEmail] = useState('');
     const [userName, setUserName] = useState('');
+    const [userId, setUserId] = useState('');
     const [sensorData, setSensorData] = useState(null);
     const [emailSending, setEmailSending] = useState(false);
     const [emailMessage, setEmailMessage] = useState('');
@@ -24,6 +25,9 @@ function Settings() {
     });
     const [alertMessage, setAlertMessage] = useState('');
     const [alertError, setAlertError] = useState('');
+    const [motionAlertEnabled, setMotionAlertEnabled] = useState(false);
+    const [motionAlertMessage, setMotionAlertMessage] = useState('');
+    const [motionAlertError, setMotionAlertError] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -138,6 +142,43 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
         }
     };
 
+    // Funktion til at håndtere toggle motion detect email alerts
+    const handleToggleMotionAlert = async (enabled) => {
+        setMotionAlertMessage('');
+        setMotionAlertError('');
+
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('You are not logged in');
+            }
+
+            if (!userId) {
+                throw new Error('User ID not available');
+            }
+
+            const response = await fetch(`http://localhost:5001/api/Users/${userId}/set-alerts`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ sendEmailAlert: enabled }),
+            });
+
+            if (response.ok) {
+                setMotionAlertEnabled(enabled);
+                setMotionAlertMessage(`Motion detection email alerts ${enabled ? 'enabled' : 'disabled'} successfully!`);
+            } else {
+                const errorData = await response.text();
+                throw new Error(errorData || 'Failed to update motion alert settings');
+            }
+        } catch (err) {
+            setMotionAlertError(err.message || 'An error occurred while updating motion alert settings');
+            console.error('Motion alert settings update error:', err);
+        }
+    };
+
     // Funktion til at sende alert email
     const sendAlertEmail = async (currentMoistureLevel, email, name) => {
         try {
@@ -227,6 +268,9 @@ This is an automated alert from your sensor monitoring system.
                     throw new Error('User ID not found in response');
                 }
 
+                // Gem user ID til senere brug
+                setUserId(UserId);
+
                 // Fetch user detaljer ved hjælp af det fetchede user ID
                 const userRes = await fetch(`http://localhost:5001/api/Users/${UserId}`);
                 if (!userRes.ok) throw new Error('Failed to fetch user');
@@ -234,6 +278,22 @@ This is an automated alert from your sensor monitoring system.
 
                 setUserEmail(userData.email);
                 setUserName(userData.username || userData.name || 'User');
+
+                // Fetch motion alert settings
+                try {
+                    const alertSettingsRes = await fetch(`http://localhost:5001/api/Users/${UserId}/alerts`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (alertSettingsRes.ok) {
+                        const alertSettings = await alertSettingsRes.json();
+                        setMotionAlertEnabled(alertSettings.sendEmailAlert || false);
+                    }
+                } catch (alertError) {
+                    console.error('Error fetching motion alert settings:', alertError);
+                }
 
                 const userArduinoId = userData.arduinoId;
 
@@ -421,6 +481,36 @@ This is an automated alert from your sensor monitoring system.
                 ) : (
                     <p>Loading sensor data...</p>
                 )}
+            </div>
+
+            {/* Motion Detection Email Alerts Sektion */}
+            <div className="settings-section">
+                <h3>Motion Detection Email Alerts</h3>
+                <div className="alert-settings">
+                    <p>Configure whether to receive email alerts when motion is detected.</p>
+
+                    <div className="form-group">
+                        <label className="toggle-label">
+                            <input
+                                type="checkbox"
+                                checked={motionAlertEnabled}
+                                onChange={(e) => handleToggleMotionAlert(e.target.checked)}
+                            />
+                            <span className="toggle-text">
+                                {motionAlertEnabled ? 'Email Alerts Enabled' : 'Email Alerts Disabled'}
+                            </span>
+                        </label>
+                    </div>
+
+                    <p className="alert-info">
+                        {motionAlertEnabled
+                            ? 'You will receive an email alert when motion is detected'
+                            : 'Enable alerts to receive email notifications when motion is detected'}
+                    </p>
+
+                    {motionAlertMessage && <p className="success-message">{motionAlertMessage}</p>}
+                    {motionAlertError && <p className="error">{motionAlertError}</p>}
+                </div>
             </div>
 
             <div className="back-link">

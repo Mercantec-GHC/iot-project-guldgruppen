@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import './Login.css'; // Make sure you have this CSS file for styling
+import './Login.css';
 
 function Login() {
     const { setIsAuthenticated } = useAuth();

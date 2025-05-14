@@ -2,240 +2,257 @@
 #include <WiFiServer.h>
 #include <FlashStorage.h>
 #include <ArduinoHttpClient.h>
-#include <Arduino_MKRENV.h>
+#include <Arduino_MKRIoTCarrier.h>
 
+MKRIoTCarrier carrier; // Carrier board objekt til sensorer og display
+
+// WiFi indstillinger - kan bruge hardcodede eller gemte credentials
 #define USE_HARDCODED_WIFI true
 const char* HARDCODED_SSID = "Zyxel_BA2F";
 const char* HARDCODED_PASS = "G7QLB4EAMY";
 
-WiFiServer server(80);
+WiFiServer server(80); // Opret en server på port 80
 
 // Struct til at gemme WiFi loginoplysninger
 typedef struct {
-  char ssid[32];
-  char pass[64];
+  char ssid[32];  // WiFi netværksnavn
+  char pass[64];  // WiFi adgangskode
 } WiFiCredentials;
 
-// Flash-lager til at gemme WiFi credentials
+// Flash-lager til at gemme WiFi credentials (beholder data ved genstart)
 FlashStorage(wifiCredsStore, WiFiCredentials);
 
-// Server indstillinger
+// Server indstillinger for backend kommunikation
 char serverAddress[] = "192.168.1.234";
 int serverPort = 5001;
 
-// Unikt ID for Arduino'en
+// Unikt ID for Arduino'en (simulerer en UUID)
 const char* arduinoId = "123e4567-e89b-12d3-a456-426614174001";
 
-WiFiClient wifi;
-HttpClient client(wifi, serverAddress, serverPort);
+WiFiClient wifi; // WiFi klient objekt
+HttpClient client(wifi, serverAddress, serverPort); // HTTP klient
 
-// Timing variabler
+// Timing variabler for regulær dataafsendelse
 unsigned long lastPostTime = 0;
-const unsigned long postInterval = 1000;
+const unsigned long postInterval = 1000; // Interval i millisekunder (1 sekund)
 
-// Fugtighedssensor pin
-const int MOISTURE_PIN = A1;
+// Sensor pins
+const int MOISTURE_PIN = A1;  // Fugtighedssensor pin
+const int PIR_PIN = A5;       // Bevægelsessensor (PIR) pin
 
-// Bevægelsessensor (PIR) pin
-const int PIR_PIN = A5;
-
-// Opsætning af fugtighedssensor (tom - kun til fremtidig brug)
-void setupMoistureSensor(){}
-
-// Læser fugtighedsniveau fra sensoren og returnerer som procent
-int readMoistureLevel() {
-  int sensorValue = analogRead(MOISTURE_PIN);
-  int moisturePercent = map(sensorValue, 1023, 0, 0, 100);
-  moisturePercent = constrain(moisturePercent, 0, 100);
-  return moisturePercent;
-}
-
-// Opsætning af PIR (bevægelses)sensor
-void setupPIRSensor() {
-  pinMode(PIR_PIN, INPUT);
-}
-
-// Læser bevægelsessensoren og returnerer true hvis der er bevægelse
-bool readMotion() {
-  return digitalRead(PIR_PIN) == HIGH;
-}
-
-// Opsætning af temperatur sensor (fra MKR ENV shield)
-void setupTemperatureSensor() {
-  if (!ENV.begin()) {
-    Serial.println("Failed to initialize ENV sensor!");
-    while (1);
-  }
-}
-
-// Læser temperatur fra sensoren
-float readTemperature() {
-  return ENV.readTemperature();
-}
-
-// Hovedopsætningsfunktion - kører én gang ved start
 void setup() {
   Serial.begin(9600);
-  delay(2000); // Vent på Serial monitor
+  while (!Serial); // Vent på seriel forbindelse (kun nødvendigt ved debugging)
+  
+  // Initialiser carrier board
+  carrier.noCase(); // Deaktiver beskyttelsescase (hvis bruges)
+  carrier.begin();  // Start carrier board funktionalitet
 
-  setupTemperatureSensor();
-  setupMoistureSensor();
-  setupPIRSensor();
+  // Initialiser miljøsensor
+  if (!carrier.Env.begin()) {
+    Serial.println("Failed to initialize ENV sensor!");
+    while (1); // Stop programmet hvis sensor ikke initialiseres
+  }
+  
+  pinMode(PIR_PIN, INPUT); // Sæt PIR sensor pin som input
 
+  // Forbind til WiFi
   bool connected = false;
-
-  // Prøv at forbinde med hardcodede WiFi credentials
+  
+  // Prøv først hardcodede WiFi oplysninger hvis aktiveret
   if (USE_HARDCODED_WIFI) {
-    Serial.print("Connecting with hardcoded WiFi: ");
-    Serial.println(HARDCODED_SSID);
+    Serial.print("Connecting to WiFi...");
     WiFi.begin(HARDCODED_SSID, HARDCODED_PASS);
-
-    int attempt = 0;
-    while (WiFi.status() != WL_CONNECTED && attempt < 10) {
+    
+    // Prøv i 10 sekunder at forbinde
+    for (int i = 0; i < 10; i++) {
+      if (WiFi.status() == WL_CONNECTED) {
+        connected = true;
+        break;
+      }
       delay(1000);
       Serial.print(".");
-      attempt++;
-    }
-
-    if (WiFi.status() == WL_CONNECTED) {
-      Serial.println("\nConnected to WiFi with hardcoded credentials!");
-      connected = true;
-    } else {
-      Serial.println("\nFailed to connect with hardcoded credentials.");
     }
   }
 
   // Hvis ikke forbundet, prøv gemte credentials fra flash
   if (!connected) {
     WiFiCredentials creds = wifiCredsStore.read();
-
-    if (strlen(creds.ssid) > 0 && strlen(creds.pass) > 0) {
-      Serial.print("Connecting to saved WiFi: ");
-      Serial.println(creds.ssid);
+    if (strlen(creds.ssid) > 0) { // Tjek om der er gemte credentials
+      Serial.print("Trying saved WiFi...");
       WiFi.begin(creds.ssid, creds.pass);
-
-      int attempt = 0;
-      while (WiFi.status() != WL_CONNECTED && attempt < 10) {
+      
+      // Prøv i 10 sekunder at forbinde
+      for (int i = 0; i < 10; i++) {
+        if (WiFi.status() == WL_CONNECTED) {
+          connected = true;
+          break;
+        }
         delay(1000);
         Serial.print(".");
-        attempt++;
-      }
-
-      if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("\nConnected to WiFi using saved credentials!");
-        connected = true;
-      } else {
-        Serial.println("\nFailed to connect using saved credentials.");
       }
     }
   }
 
-  // Hvis stadig ikke forbundet, start som access point til opsætning
-  if (!connected) {
-    Serial.println("Starting AP for setup...");
-    WiFi.beginAP("Arduino-Setup");
-    Serial.print("AP IP Address: ");
+  // Hvis forbundet, vis IP-adresse
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nConnected!");
+    Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
-    server.begin();
+  } else {
+    // Hvis ikke forbundet, start som access point til konfiguration
+    Serial.println("\nStarting AP mode");
+    WiFi.beginAP("ArduinoSetup"); // Opret WiFi netværk med navnet "ArduinoSetup"
+    server.begin(); // Start webserveren
   }
 }
 
-// Hovedloop - kører kontinuerligt
 void loop() {
-  // Hvis i opsætningsmode, håndter setup portal
+  carrier.Buttons.update(); // Opdater knaptilstande
+
+  // Hvis i AP mode, håndter konfigurationsportal
   if (WiFi.status() == WL_AP_LISTENING || WiFi.status() == WL_AP_CONNECTED) {
     handleSetupPortal();
-  } else {
-    // Ellers kør normal logik
-    runMainLogic();
+    return; // Spring over hovedlogik i AP mode
+  }
+
+  // Hvis ikke forbundet til WiFi, vent og prøv igen
+  if (WiFi.status() != WL_CONNECTED) {
+    delay(5000);
+    return;
+  }
+
+  // Hvis der trykkes på TOUCH0, send anmodning om sensorlæsning
+  if (carrier.Buttons.onTouchDown(TOUCH0)) {
+    sendSensorReadingRequest(arduinoId);
+  }
+
+  // Send sensordata med jævne mellemrum
+  if (millis() - lastPostTime >= postInterval) {
+    // Læs sensorværdier
+    float temperature = carrier.Env.readTemperature(); // Temperatur fra carrier
+    bool motion = digitalRead(PIR_PIN) == HIGH; // Bevægelsessensor (HIGH = bevægelse)
+    // Læs fugtighed og konverter til procent (0-100)
+    int moisture = map(analogRead(MOISTURE_PIN), 1023, 0, 0, 100);
+    moisture = constrain(moisture, 0, 100); // Sikre værdi er mellem 0-100
+    
+    sendSensorData(temperature, motion, moisture); // Send data til server
+    lastPostTime = millis(); // Opdater sidste sendetidspunkt
   }
 }
 
-// Håndterer WiFi opsætningsportalen
+// Funktion til at sende sensordata til serveren
+void sendSensorData(float temp, bool motion, int moisture) {
+  Serial.println("Preparing to send data...");
+  
+  // Opret JSON string med sensordata
+  String data = "{\"arduinoId\":\"" + String(arduinoId) + "\",";
+  data += "\"temperature\":" + String(temp, 2) + ","; // Temperatur med 2 decimaler
+  data += "\"motionDetected\":" + String(motion ? "true" : "false") + ",";
+  data += "\"moistureLevel\":" + String(moisture) + "}";
+
+  Serial.println("Sending: " + data); // Debug output
+  
+  // Send HTTP POST request
+  client.beginRequest();
+  client.post("/api/sensor/reading"); // API endpoint
+  client.sendHeader("Content-Type", "application/json");
+  client.sendHeader("Content-Length", data.length());
+  client.beginBody();
+  client.print(data); // Send JSON data
+  client.endRequest();
+
+  // Læs svar fra serveren
+  int status = client.responseStatusCode();
+  String response = client.responseBody();
+  
+  // Udskriv svar til seriel monitor
+  Serial.print("Status: ");
+  Serial.println(status);
+  Serial.print("Response: ");
+  Serial.println(response);
+  
+  client.stop(); // Luk forbindelsen
+}
+
+// Funktion til at anmode om at få tilsendt sensordata på mail
+void sendSensorReadingRequest(const String& id) {
+  Serial.println("Sending email request...");
+  
+  String data = "\"" + id + "\""; // Send kun Arduino ID som data
+  
+  // Send HTTP POST request til mail-endpoint
+  client.beginRequest();
+  client.post("/Mail/send-sensor-reading");
+  client.sendHeader("Content-Type", "application/json");
+  client.sendHeader("Content-Length", data.length());
+  client.beginBody();
+  client.print(data);
+  client.endRequest();
+
+  // Læs svar fra serveren
+  int status = client.responseStatusCode();
+  String response = client.responseBody();
+  
+  // Udskriv svar til seriel monitor
+  Serial.print("Email status: ");
+  Serial.println(status);
+  Serial.print("Response: ");
+  Serial.println(response);
+  
+  client.stop(); // Luk forbindelsen
+}
+
+// Håndter WiFi konfigurationsportal når i AP mode
 void handleSetupPortal() {
-  WiFiClient client = server.available();
+  WiFiClient client = server.available(); // Tjek for indkomne forbindelser
   if (client) {
-    Serial.println("Client connected for setup");
-    String request = client.readStringUntil('\r');
-    Serial.println(request);
+    String request = client.readStringUntil('\r'); // Læs HTTP request
     client.flush();
 
-    // Håndterer /save request med nye WiFi credentials
+    // Hvis request indeholder /save? (form submission)
     if (request.indexOf("/save?") != -1) {
+      // Udtræk SSID og password fra URL parametre
       String ssid = getParam(request, "ssid");
       String pass = getParam(request, "pass");
-
+      
+      // Hvis både SSID og password er angivet, gem dem i flash
       if (ssid.length() > 0 && pass.length() > 0) {
         WiFiCredentials creds;
-        ssid.toCharArray(creds.ssid, sizeof(creds.ssid));
-        pass.toCharArray(creds.pass, sizeof(creds.pass));
-        wifiCredsStore.write(creds);
-
+        ssid.toCharArray(creds.ssid, 32); // Kopier SSID til struct
+        pass.toCharArray(creds.pass, 64); // Kopier password til struct
+        wifiCredsStore.write(creds); // Gem i flash-lager
+        
+        // Send svar til browseren
         client.println("HTTP/1.1 200 OK");
         client.println("Content-Type: text/html");
         client.println();
-        client.println("<h1>Saved! Rebooting...</h1>");
+        client.println("<h1>Saved. Rebooting...</h1>");
         delay(2000);
-        NVIC_SystemReset(); // Soft reset
+        NVIC_SystemReset(); // Genstart Arduino
       }
     } else {
-      // Viser WiFi opsætningsformular
+      // Vis WiFi konfigurationsformular
       client.println("HTTP/1.1 200 OK");
       client.println("Content-Type: text/html");
       client.println();
       client.println("<h1>WiFi Setup</h1>");
-      client.println("<form action=\"/save\" method=\"GET\">");
-      client.println("SSID: <input name=\"ssid\"><br>");
-      client.println("Password: <input name=\"pass\" type=\"password\"><br>");
-      client.println("<input type=\"submit\" value=\"Save\">");
+      client.println("<form action='/save' method='GET'>");
+      client.println("SSID: <input name='ssid'><br>");
+      client.println("Password: <input name='pass' type='password'><br>");
+      client.println("<input type='submit' value='Save'>");
       client.println("</form>");
     }
-    client.stop();
+    client.stop(); // Luk forbindelsen
   }
 }
 
-// Hjælpefunktion til at udtrække parametre fra HTTP request
+// Hjælpefunktion til at udtrække parametre fra URL
 String getParam(String request, String key) {
-  int start = request.indexOf(key + "=");
-  if (start == -1) return "";
-  start += key.length() + 1;
-  int end = request.indexOf('&', start);
+  int start = request.indexOf(key + "="); // Find start af parameter
+  if (start == -1) return ""; // Hvis ikke fundet, returner tom streng
+  start += key.length() + 1; // Flyt markør til efter '='
+  int end = request.indexOf('&', start); // Find slutningen (enten & eller mellemrum)
   if (end == -1) end = request.indexOf(' ', start);
-  return request.substring(start, end);
-}
-
-// Hovedlogik - læser sensorer og sender data
-void runMainLogic() {
-  float temperature = readTemperature();
-  bool motionDetected = readMotion();
-  int moisture = readMoistureLevel();
-
-  unsigned long currentTime = millis();
-  if (currentTime - lastPostTime >= postInterval) {
-    sendSensorData(temperature, motionDetected, moisture);
-    lastPostTime = currentTime;
-  }
-}
-
-// Sender sensordata til serveren via HTTP POST
-void sendSensorData(float temperature, bool motionDetected, int moisture) {
-  String postData = "{\"arduinoId\":\"" + String(arduinoId) + "\"," +
-                    "\"temperature\":" + String(temperature, 2) +
-                    ",\"motionDetected\":" + String(motionDetected ? "true" : "false") +
-                    ",\"moistureLevel\":" + String(moisture) + "}";
-
-  client.beginRequest();
-  client.post("/api/sensor/reading");
-  client.sendHeader("Content-Type", "application/json");
-  client.sendHeader("Content-Length", postData.length());
-  client.beginBody();
-  client.print(postData);
-  client.endRequest();
-
-  int statusCode = client.responseStatusCode();
-  String response = client.responseBody();
-  Serial.print("Status code: ");
-  Serial.println(statusCode);
-  Serial.print("Response: ");
-  Serial.println(response);
+  return request.substring(start, end); // Returner parameter værdi
 }

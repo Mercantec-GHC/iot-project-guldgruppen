@@ -13,6 +13,8 @@ public class User
     
     public string ArduinoId { get; set; }  
     public string PhoneNumber { get; set; }
+    public bool SendEmailAlert { get; set; } = false;
+    public DateTime? LastMotionAlertSentAt { get; set; }
 }
 
 public class UserDTO
@@ -24,6 +26,7 @@ public class UserDTO
     
     public string ArduinoId { get; set; }  
     public string PhoneNumber { get; set; }
+    public bool SendEmailAlert { get; set; }
 }
 
 public class UserDtoRegister
@@ -45,4 +48,9 @@ public class UserDtoUpdateEmail
 {
     public string NewEmail { get; set; }
     public string CurrentPassword { get; set; }
+}
+
+public class UpdateAlertsDto
+{
+    public bool SendEmailAlert { get; set; }
 }

@@ -729,3 +729,5 @@ G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin
 G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\MimeKit.dll
 G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
 G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Newtonsoft.Json.dll
+G:\C-Sharp Code\H3 - Arduino Project\iot-project-guldgruppen\backend\backend\bin\Debug\net8.0\Twilio.dll
