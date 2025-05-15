@@ -37,7 +37,6 @@ unsigned long lastPostTime = 0;
 const unsigned long postInterval = 1000; // Interval i millisekunder (1 sekund)
 
 // Sensor pins
-const int MOISTURE_PIN = A1;  // Fugtighedssensor pin
 const int PIR_PIN = A5;       // Bevægelsessensor (PIR) pin
 
 void setup() {
@@ -184,8 +183,7 @@ void loop() {
   if (carrier.Buttons.onTouchDown(TOUCH1)) {
     // Læs sensordata
     float temperature = carrier.Env.readTemperature();
-    int moisture = map(analogRead(MOISTURE_PIN), 1023, 0, 0, 100);
-    moisture = constrain(moisture, 0, 100);
+    float humidity = carrier.Env.readHumidity();
 
     // Vis data på display
     carrier.display.fillScreen(0x0000);  
@@ -198,8 +196,8 @@ void loop() {
     carrier.display.print(" C");
 
     carrier.display.setCursor(30, 100);
-    carrier.display.print("Moisture: ");
-    carrier.display.print(moisture);
+    carrier.display.print("Humidity: ");
+    carrier.display.print(humidity);
     carrier.display.print(" %");
 
     delay(4000);  // Vis data i 4 sekunder
@@ -225,23 +223,22 @@ void loop() {
     float temperature = carrier.Env.readTemperature(); // Temperatur fra carrier
     bool motion = digitalRead(PIR_PIN) == HIGH; // Bevægelsessensor (HIGH = bevægelse)
     // Læs fugtighed og konverter til procent (0-100)
-    int moisture = map(analogRead(MOISTURE_PIN), 1023, 0, 0, 100);
-    moisture = constrain(moisture, 0, 100); // Sikre værdi er mellem 0-100
+    float humidity = carrier.Env.readHumidity();
     
-    sendSensorData(temperature, motion, moisture); // Send data til server
+    sendSensorData(temperature, motion, humidity); // Send data til server
     lastPostTime = millis(); // Opdater sidste sendetidspunkt
   }
 }
 
 // Funktion til at sende sensordata til serveren
-void sendSensorData(float temp, bool motion, int moisture) {
+void sendSensorData(float temp, bool motion, float humidity) {
   Serial.println("Preparing to send data...");
   
   // Opret JSON string med sensordata
   String data = "{\"arduinoId\":\"" + String(arduinoId) + "\",";
   data += "\"temperature\":" + String(temp, 2) + ","; // Temperatur med 2 decimaler
   data += "\"motionDetected\":" + String(motion ? "true" : "false") + ",";
-  data += "\"moistureLevel\":" + String(moisture) + "}";
+  data += "\"humdityLevel\":" + String(humidity) + "}";
 
   Serial.println("Sending: " + data); // Debug output
   
