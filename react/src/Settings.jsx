@@ -15,7 +15,7 @@ function Settings() {
     const [emailSending, setEmailSending] = useState(false);
     const [emailMessage, setEmailMessage] = useState('');
     const [emailError, setEmailError] = useState('');
-    const [moistureThreshold, setMoistureThreshold] = useState(80);
+    const [humidityThreshold, setHumidityThreshold] = useState(80);
     const [alertsEnabled, setAlertsEnabled] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertError, setAlertError] = useState('');
@@ -89,7 +89,7 @@ function Settings() {
 Latest Sensor Data:
 ------------------
 Temperature: ${sensorData.temperature}°C
-Moisture Level: ${sensorData.moistureLevel}%
+Humidity Level: ${sensorData.humidityLevel}%
 Motion Detected: ${sensorData.motionDetected ? 'Yes' : 'No'}
 Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
             `.trim();
@@ -138,15 +138,15 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
                 throw new Error('User ID not available');
             }
 
-            const response = await fetch(`http://localhost:5001/api/Users/${userId}/set-moisture-alerts`, {
+            const response = await fetch(`http://localhost:5001/api/Users/${userId}/set-humidity-alerts`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    sendMoistureAlert: alertsEnabled,
-                    moistureThreshold: moistureThreshold
+                    sendHumidityAlert: alertsEnabled,
+                    humidityThreshold: humidityThreshold
                 }),
             });
 
@@ -154,7 +154,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
                 setAlertMessage('Alert settings saved successfully!');
             } else {
                 const errorData = await response.text();
-                throw new Error(errorData || 'Failed to update moisture alert settings');
+                throw new Error(errorData || 'Failed to update humidity alert settings');
             }
         } catch (error) {
             setAlertError(error.message || 'Failed to save alert settings');
@@ -290,25 +290,25 @@ This is an automated alert from your sensor monitoring system.
     };
 
     // Funktion til at sende alert email
-    const sendAlertEmail = async (currentMoistureLevel, email, name) => {
+    const sendAlertEmail = async (currentHumidityLevel, email, name) => {
         try {
             if (!email) {
                 throw new Error('User email not available');
             }
 
-            const numericMoistureLevel = Number(currentMoistureLevel);
-            const numericThreshold = Number(moistureThreshold);
+            const numericHumidityLevel = Number(currentHumidityLevel);
+            const numericThreshold = Number(humidityThreshold);
 
             console.log('Sending alert with values:', {
-                moistureLevel: numericMoistureLevel,
+                humidityLevel: numericHumidityLevel,
                 threshold: numericThreshold
             });
 
             // Formater alert email body
             const emailBody = `
-Alert: Moisture Level Threshold Exceeded!
+Alert: Humidity Level Threshold Exceeded!
 ------------------------------------------
-Current Moisture Level: ${numericMoistureLevel}%
+Current Humidity Level: ${numericHumidityLevel}%
 Your Threshold Setting: ${numericThreshold}%
 
 This is an automated alert from your sensor monitoring system.
@@ -324,7 +324,7 @@ This is an automated alert from your sensor monitoring system.
                 body: JSON.stringify({
                     emailToId: email,
                     emailToName: name,
-                    emailSubject: 'ALERT: Moisture Level Threshold Exceeded',
+                    emailSubject: 'ALERT: Humidity Level Threshold Exceeded',
                     emailBody: emailBody
                 })
             });
@@ -403,21 +403,21 @@ This is an automated alert from your sensor monitoring system.
                     console.error('Error fetching motion alert settings:', alertError);
                 }
 
-                // Fetch moisture alert settings
+                // Fetch humidity alert settings
                 try {
-                    const moistureAlertSettingsRes = await fetch(`http://localhost:5001/api/Users/${UserId}/moisture-alerts`, {
+                    const humidityAlertSettingsRes = await fetch(`http://localhost:5001/api/Users/${UserId}/humidity-alerts`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
 
-                    if (moistureAlertSettingsRes.ok) {
-                        const moistureAlertSettings = await moistureAlertSettingsRes.json();
-                        setAlertsEnabled(moistureAlertSettings.sendMoistureAlert || false);
-                        setMoistureThreshold(moistureAlertSettings.moistureThreshold || 80);
+                    if (humidityAlertSettingsRes.ok) {
+                        const humidityAlertSettings = await humidityAlertSettingsRes.json();
+                        setAlertsEnabled(humidityAlertSettings.sendHumidityAlert || false);
+                        setHumidityThreshold(humidityAlertSettings.humidityThreshold || 80);
                     }
-                } catch (moistureAlertError) {
-                    console.error('Error fetching moisture alert settings:', moistureAlertError);
+                } catch (humidityAlertError) {
+                    console.error('Error fetching humidity alert settings:', humidityAlertError);
                 }
 
                 // Fetch temperature alert settings
@@ -449,25 +449,25 @@ This is an automated alert from your sensor monitoring system.
                     setSensorData(newSensorData);
 
                     // Konverter værdier til numre for at sikre korrekt sammenligning
-                    const currentMoistureLevel = newSensorData ? Number(newSensorData.moistureLevel) : 0;
-                    const moistureThresholdValue = Number(moistureThreshold);
+                    const currentHumidityLevel = newSensorData ? Number(newSensorData.humidityLevel) : 0;
+                    const humidityThresholdValue = Number(humidityThreshold);
 
-                    console.log('Moisture Alert Check:', {
+                    console.log('Humidity Alert Check:', {
                         alertsEnabled: alertsEnabled,
-                        currentMoistureLevel,
-                        threshold: moistureThresholdValue,
-                        exactMatch: currentMoistureLevel === moistureThresholdValue,
-                        exceedsThreshold: currentMoistureLevel > moistureThresholdValue,
-                        meetsOrExceedsThreshold: currentMoistureLevel >= moistureThresholdValue
+                        currentHumidityLevel,
+                        threshold: humidityThresholdValue,
+                        exactMatch: currentHumidityLevel === humidityThresholdValue,
+                        exceedsThreshold: currentHumidityLevel > humidityThresholdValue,
+                        meetsOrExceedsThreshold: currentHumidityLevel >= humidityThresholdValue
                     });
 
-                    // Tjek om alerts er slået til og moisture level når eller overstiger threshold
+                    // Tjek om alerts er slået til og humidity level når eller overstiger threshold
                     if (alertsEnabled && newSensorData &&
-                        (currentMoistureLevel >= moistureThresholdValue)) {
-                        console.log('Sending moisture alert email!');
+                        (currentHumidityLevel >= humidityThresholdValue)) {
+                        console.log('Sending humidity alert email!');
                         // Send en alert email hver gang threshold nås eller overskrider
                         sendAlertEmail(
-                            currentMoistureLevel,
+                            currentHumidityLevel,
                             userData.email,
                             userData.username || userData.name || 'User'
                         );
@@ -512,7 +512,7 @@ This is an automated alert from your sensor monitoring system.
 
         // Clear interval når alert slås fra
         return () => clearInterval(interval);
-    }, [navigate, alertsEnabled, moistureThreshold, temperatureAlertsEnabled, temperatureThreshold]);
+    }, [navigate, alertsEnabled, humidityThreshold, temperatureAlertsEnabled, temperatureThreshold]);
 
     return (
         <div className="login-container">
@@ -561,7 +561,7 @@ This is an automated alert from your sensor monitoring system.
                     <div className="sensor-data-preview">
                         <p><strong>Current Sensor Data:</strong></p>
                         <p>Temperature: {sensorData.temperature}°C</p>
-                        <p>Moisture Level: {sensorData.moistureLevel}%</p>
+                        <p>Humidity Level: {sensorData.humidityLevel}%</p>
                         <p>Motion Detected: {sensorData.motionDetected ? 'Yes' : 'No'}</p>
                         <p>Timestamp: {new Date(sensorData.timestamp).toLocaleString()}</p>
 
@@ -582,24 +582,24 @@ This is an automated alert from your sensor monitoring system.
                 )}
             </div>
 
-            {/* Moisture Alert Settings Sektion */}
+            {/* Humidity Alert Settings Sektion */}
             <div className="settings-section">
-                <h3>Moisture Alert Settings</h3>
+                <h3>Humidity Alert Settings</h3>
                 {sensorData ? (
                     <div className="alert-settings">
-                        <p>Configure alerts to be notified when moisture levels exceed a threshold.</p>
+                        <p>Configure alerts to be notified when humidity levels exceed a threshold.</p>
 
                         <div className="form-group">
-                            <label htmlFor="moistureThreshold">
-                                Moisture Threshold: <strong>{moistureThreshold}%</strong>
+                            <label htmlFor="humidityThreshold">
+                                Humidity Threshold: <strong>{humidityThreshold}%</strong>
                             </label>
                             <input
-                                id="moistureThreshold"
+                                id="humidityThreshold"
                                 type="range"
                                 min="0"
                                 max="100"
-                                value={moistureThreshold}
-                                onChange={(e) => setMoistureThreshold(parseInt(e.target.value, 10))}
+                                value={humidityThreshold}
+                                onChange={(e) => setHumidityThreshold(parseInt(e.target.value, 10))}
                                 className="slider"
                             />
                             <div className="slider-labels">
@@ -624,7 +624,7 @@ This is an automated alert from your sensor monitoring system.
 
                         <p className="alert-info">
                             {alertsEnabled
-                                ? `You will receive an email alert when moisture level exceeds ${moistureThreshold}%`
+                                ? `You will receive an email alert when humidity level exceeds ${humidityThreshold}%`
                                 : 'Enable alerts to receive email notifications'}
                         </p>
 

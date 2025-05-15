@@ -44,7 +44,7 @@ public class SensorRepository : ISensorRepository
         {
             existing.Temperature = reading.Temperature;
             existing.MotionDetected = reading.MotionDetected;
-            existing.MoistureLevel = reading.MoistureLevel;
+            existing.HumidityLevel = reading.HumidityLevel;
             existing.Timestamp = DateTime.UtcNow;
 
             _context.SensorReadings.Update(existing);

@@ -6,7 +6,7 @@ import './SensorData.css';
 
 
 function SensorData() {
-    const [sensorData, setSensorData] = useState({ temperature: 0, moistureLevel: 0, motionDetected: false });
+    const [sensorData, setSensorData] = useState({ temperature: 0, humidityLevel: 0, motionDetected: false });
     const [arduinoId, setArduinoId] = useState(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -160,7 +160,7 @@ function SensorData() {
                         maxValue={35}
                     />
                 </div>
-                <div className="moisture-gauge">
+                <div className="humidity-gauge">
                     <GaugeComponent
                         type="radial"
                         arc={{
@@ -168,15 +168,15 @@ function SensorData() {
                             padding: 0.005,
                             cornerRadius: 1,
                             subArcs: [
-                                { limit: 20, color: '#EA4228', showTick: true, tooltip: { text: 'Too Low Moisture!' } },
-                                { limit: 40, color: '#F5CD19', showTick: true, tooltip: { text: 'Low Moisture!' } },
-                                { limit: 60, color: '#5BE12C', showTick: true, tooltip: { text: 'Optimal Moisture!' } },
-                                { limit: 80, color: '#1e9bef', showTick: true, tooltip: { text: 'High Moisture!' } },
-                                { limit: 100, color: '#154ad0', showTick: true, tooltip: { text: 'Too High Moisture!' } }
+                                { limit: 20, color: '#EA4228', showTick: true, tooltip: { text: 'Too Low Humidity!' } },
+                                { limit: 40, color: '#F5CD19', showTick: true, tooltip: { text: 'Low Humidity!' } },
+                                { limit: 60, color: '#5BE12C', showTick: true, tooltip: { text: 'Optimal Humidity!' } },
+                                { limit: 80, color: '#1e9bef', showTick: true, tooltip: { text: 'High Humidity!' } },
+                                { limit: 100, color: '#154ad0', showTick: true, tooltip: { text: 'Too High Humidity!' } }
                             ]
                         }}
                         pointer={{ color: '#345243', length: 0.80, width: 15 }}
-                        value={sensorData.moistureLevel}
+                        value={sensorData.humidityLevel}
                     />
                 </div>
             </div>

@@ -21,7 +21,7 @@ namespace backend.Migrations
                     ArduinoId = table.Column<string>(type: "text", nullable: false),
                     Temperature = table.Column<float>(type: "real", nullable: true),
                     MotionDetected = table.Column<bool>(type: "boolean", nullable: true),
-                    MoistureLevel = table.Column<int>(type: "integer", nullable: true),
+                    HumidityLevel = table.Column<int>(type: "integer", nullable: true),
                     Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>

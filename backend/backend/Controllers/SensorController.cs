@@ -108,8 +108,8 @@ public class SensorController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("moisture")]
-    public async Task<IActionResult> PostMoisture([FromBody] MoistureReadingDto dto)
+    [HttpPost("Humidity")]
+    public async Task<IActionResult> PostHumidity([FromBody] HumidityReadingDto dto)
     {
         if (!await IsValidArduinoId(dto.ArduinoId))
         {
@@ -119,13 +119,13 @@ public class SensorController : ControllerBase
         var reading = new SensorReading
         {
             ArduinoId = dto.ArduinoId,
-            MoistureLevel = dto.MoistureLevel,
+            HumidityLevel = dto.HumidityLevel,
             Timestamp = DateTime.UtcNow
         };
         await _repository.UpsertAsync(reading);
 
-        // Check moisture threshold
-        await CheckMoistureThreshold(dto.ArduinoId, dto.MoistureLevel);
+        // Check Humidity threshold
+        await CheckHumidityThreshold(dto.ArduinoId, dto.HumidityLevel);
 
         return Ok();
     }
@@ -162,7 +162,7 @@ public class SensorController : ControllerBase
             ArduinoId = dto.ArduinoId,
             Temperature = dto.Temperature,
             MotionDetected = dto.MotionDetected,
-            MoistureLevel = dto.MoistureLevel,
+            HumidityLevel = dto.HumidityLevel,
             Timestamp = DateTime.UtcNow
         };
         await _repository.UpsertAsync(reading);
@@ -173,9 +173,9 @@ public class SensorController : ControllerBase
             await CheckTemperatureThreshold(dto.ArduinoId, dto.Temperature.Value);
         }
     
-        if (dto.MoistureLevel.HasValue)
+        if (dto.HumidityLevel.HasValue)
         {
-            await CheckMoistureThreshold(dto.ArduinoId, dto.MoistureLevel.Value);
+            await CheckHumidityThreshold(dto.ArduinoId, dto.HumidityLevel.Value);
         }
 
         if (dto.MotionDetected && user.SendEmailAlert)
@@ -248,26 +248,26 @@ public class SensorController : ControllerBase
         }
     }
 
-    private async Task CheckMoistureThreshold(string arduinoId, int moistureLevel)
+    private async Task CheckHumidityThreshold(string arduinoId, int HumidityLevel)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.ArduinoId == arduinoId);
-        if (user == null || !user.SendMoistureAlert || !user.MoistureThreshold.HasValue)
+        if (user == null || !user.SendHumidityAlert || !user.HumidityThreshold.HasValue)
             return;
 
-        if (moistureLevel >= user.MoistureThreshold.Value)
+        if (HumidityLevel >= user.HumidityThreshold.Value)
         {
-            var timeSinceLastAlert = DateTime.UtcNow - (user.LastMoistureAlertSentAt ?? DateTime.MinValue);
+            var timeSinceLastAlert = DateTime.UtcNow - (user.LastHumidityAlertSentAt ?? DateTime.MinValue);
             var alertCooldown = TimeSpan.FromMinutes(5);
             
             if (timeSinceLastAlert >= alertCooldown)
             {
-                Console.WriteLine("Attempting to send moisture alert email...");
+                Console.WriteLine("Attempting to send Humidity alert email...");
                 var mailData = new MailData
                 {
                     EmailToId = user.Email,
                     EmailToName = user.Username,
-                    EmailSubject = "Moisture Threshold Reached!",
-                    EmailBody = $"Moisture threshold ({user.MoistureThreshold}%) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current moisture level: {moistureLevel}%"
+                    EmailSubject = "Humidity Threshold Reached!",
+                    EmailBody = $"Humidity threshold ({user.HumidityThreshold}%) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current Humidity level: {HumidityLevel}%"
                 };
 
                 var emailSent = _mailService.SendMail(mailData);
@@ -275,7 +275,7 @@ public class SensorController : ControllerBase
 
                 if (emailSent)
                 {
-                    user.LastMoistureAlertSentAt = DateTime.UtcNow;
+                    user.LastHumidityAlertSentAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
                 }
             }

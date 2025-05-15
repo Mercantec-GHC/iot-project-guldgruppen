@@ -84,8 +84,8 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("{id}/set-moisture-alerts")]
-    public async Task<IActionResult> UpdateMoistureAlerts(int id, [FromBody] UpdateMoistureAlertDto updateDto)
+    [HttpPut("{id}/set-humidity-alerts")]
+    public async Task<IActionResult> UpdateHumidityAlerts(int id, [FromBody] UpdateHumidityAlertDto updateDto)
     {
         var user = await _context.Users.FindAsync(id);
         if (user == null)
@@ -93,8 +93,8 @@ public class UsersController : ControllerBase
             return NotFound();
         }
 
-        user.SendMoistureAlert = updateDto.SendMoistureAlert;
-        user.MoistureThreshold = updateDto.MoistureThreshold;
+        user.SendHumidityAlert = updateDto.SendHumidityAlert;
+        user.HumidityThreshold = updateDto.HumidityThreshold;
         await _context.SaveChangesAsync();
 
         return NoContent();

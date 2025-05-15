@@ -60,7 +60,7 @@ public class MailController : ControllerBase
                         $"Here is the latest sensor reading for your Arduino device:\n" +
                         $"- Temperature: {sensorReading.Temperature}\n" +
                         $"- Motion Detected: {sensorReading.MotionDetected}\n" +
-                        $"- Moisture Level: {sensorReading.MoistureLevel}\n" +
+                        $"- Humidity Level: {sensorReading.HumidityLevel}\n" +
                         $"- Timestamp: {sensorReading.Timestamp}\n\n" +
                         "Best regards,\nClimate Control Center"
         };

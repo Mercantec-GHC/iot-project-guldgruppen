@@ -12,7 +12,7 @@ namespace backend.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
-                name: "LastMoistureAlertSentAt",
+                name: "LastHumidityAlertSentAt",
                 table: "Users",
                 type: "timestamp with time zone",
                 nullable: true);
@@ -24,13 +24,13 @@ namespace backend.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<int>(
-                name: "MoistureThreshold",
+                name: "HumidityThreshold",
                 table: "Users",
                 type: "integer",
                 nullable: true);
 
             migrationBuilder.AddColumn<bool>(
-                name: "SendMoistureAlert",
+                name: "SendHumidityAlert",
                 table: "Users",
                 type: "boolean",
                 nullable: false,
@@ -54,7 +54,7 @@ namespace backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "LastMoistureAlertSentAt",
+                name: "LastHumidityAlertSentAt",
                 table: "Users");
 
             migrationBuilder.DropColumn(
@@ -62,11 +62,11 @@ namespace backend.Migrations
                 table: "Users");
 
             migrationBuilder.DropColumn(
-                name: "MoistureThreshold",
+                name: "HumidityThreshold",
                 table: "Users");
 
             migrationBuilder.DropColumn(
-                name: "SendMoistureAlert",
+                name: "SendHumidityAlert",
                 table: "Users");
 
             migrationBuilder.DropColumn(
