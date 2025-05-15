@@ -32,7 +32,7 @@ public class MoistureReadingDto
 public class CombinedReadingDto
 {
     public string ArduinoId { get; set; }
-    public float Temperature { get; set; }
+    public float? Temperature { get; set; }
     public bool MotionDetected { get; set; }
-    public int MoistureLevel { get; set; }
+    public int? MoistureLevel { get; set; }
 }

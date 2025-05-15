@@ -67,4 +67,36 @@ public class UsersController : ControllerBase
 
         return NoContent();
     }
+    
+    [HttpPut("{id}/set-temperature-alerts")]
+    public async Task<IActionResult> UpdateTemperatureAlerts(int id, [FromBody] UpdateTemperatureAlertDto updateDto)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        user.SendTemperatureAlert = updateDto.SendTemperatureAlert;
+        user.TemperatureThreshold = updateDto.TemperatureThreshold;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpPut("{id}/set-moisture-alerts")]
+    public async Task<IActionResult> UpdateMoistureAlerts(int id, [FromBody] UpdateMoistureAlertDto updateDto)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        user.SendMoistureAlert = updateDto.SendMoistureAlert;
+        user.MoistureThreshold = updateDto.MoistureThreshold;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

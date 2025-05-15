@@ -15,6 +15,14 @@ public class User
     public string PhoneNumber { get; set; }
     public bool SendEmailAlert { get; set; } = false;
     public DateTime? LastMotionAlertSentAt { get; set; }
+    
+    public float? TemperatureThreshold { get; set; }
+    public bool SendTemperatureAlert { get; set; } = false;
+    public DateTime? LastTemperatureAlertSentAt { get; set; }
+    
+    public int? MoistureThreshold { get; set; }
+    public bool SendMoistureAlert { get; set; } = false;
+    public DateTime? LastMoistureAlertSentAt { get; set; }
 }
 
 public class UserDTO
@@ -27,6 +35,11 @@ public class UserDTO
     public string ArduinoId { get; set; }  
     public string PhoneNumber { get; set; }
     public bool SendEmailAlert { get; set; }
+    
+    public float? TemperatureThreshold { get; set; }
+    public bool SendTemperatureAlert { get; set; }
+    public int? MoistureThreshold { get; set; }
+    public bool SendMoistureAlert { get; set; }
 }
 
 public class UserDtoRegister
@@ -53,4 +66,16 @@ public class UserDtoUpdateEmail
 public class UpdateAlertsDto
 {
     public bool SendEmailAlert { get; set; }
+}
+
+public class UpdateTemperatureAlertDto
+{
+    public bool SendTemperatureAlert { get; set; }
+    public float? TemperatureThreshold { get; set; }
+}
+
+public class UpdateMoistureAlertDto
+{
+    public bool SendMoistureAlert { get; set; }
+    public int? MoistureThreshold { get; set; }
 }

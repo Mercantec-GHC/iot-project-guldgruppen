@@ -41,6 +41,10 @@ public class SensorController : ControllerBase
             Timestamp = DateTime.UtcNow
         };
         await _repository.UpsertAsync(reading);
+
+        // Check temperature threshold
+        await CheckTemperatureThreshold(dto.ArduinoId, dto.Temperature);
+
         return Ok();
     }
 
@@ -119,6 +123,10 @@ public class SensorController : ControllerBase
             Timestamp = DateTime.UtcNow
         };
         await _repository.UpsertAsync(reading);
+
+        // Check moisture threshold
+        await CheckMoistureThreshold(dto.ArduinoId, dto.MoistureLevel);
+
         return Ok();
     }
     
@@ -159,6 +167,17 @@ public class SensorController : ControllerBase
         };
         await _repository.UpsertAsync(reading);
 
+        // Check all thresholds
+        if (dto.Temperature.HasValue)
+        {
+            await CheckTemperatureThreshold(dto.ArduinoId, dto.Temperature.Value);
+        }
+    
+        if (dto.MoistureLevel.HasValue)
+        {
+            await CheckMoistureThreshold(dto.ArduinoId, dto.MoistureLevel.Value);
+        }
+
         if (dto.MotionDetected && user.SendEmailAlert)
         {
             // Tjek om der er gået nok tid siden sidste alert
@@ -193,5 +212,73 @@ public class SensorController : ControllerBase
         }
 
         return Ok();
+    }
+    
+        private async Task CheckTemperatureThreshold(string arduinoId, float temperature)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.ArduinoId == arduinoId);
+        if (user == null || !user.SendTemperatureAlert || !user.TemperatureThreshold.HasValue)
+            return;
+
+        if (temperature >= user.TemperatureThreshold.Value)
+        {
+            var timeSinceLastAlert = DateTime.UtcNow - (user.LastTemperatureAlertSentAt ?? DateTime.MinValue);
+            var alertCooldown = TimeSpan.FromMinutes(5);
+            
+            if (timeSinceLastAlert >= alertCooldown)
+            {
+                Console.WriteLine("Attempting to send temperature alert email...");
+                var mailData = new MailData
+                {
+                    EmailToId = user.Email,
+                    EmailToName = user.Username,
+                    EmailSubject = "Temperature Threshold Reached!",
+                    EmailBody = $"Temperature threshold ({user.TemperatureThreshold}°C) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current temperature: {temperature}°C"
+                };
+
+                var emailSent = _mailService.SendMail(mailData);
+                Console.WriteLine($"Email send result: {emailSent}");
+
+                if (emailSent)
+                {
+                    user.LastTemperatureAlertSentAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+    }
+
+    private async Task CheckMoistureThreshold(string arduinoId, int moistureLevel)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.ArduinoId == arduinoId);
+        if (user == null || !user.SendMoistureAlert || !user.MoistureThreshold.HasValue)
+            return;
+
+        if (moistureLevel >= user.MoistureThreshold.Value)
+        {
+            var timeSinceLastAlert = DateTime.UtcNow - (user.LastMoistureAlertSentAt ?? DateTime.MinValue);
+            var alertCooldown = TimeSpan.FromMinutes(5);
+            
+            if (timeSinceLastAlert >= alertCooldown)
+            {
+                Console.WriteLine("Attempting to send moisture alert email...");
+                var mailData = new MailData
+                {
+                    EmailToId = user.Email,
+                    EmailToName = user.Username,
+                    EmailSubject = "Moisture Threshold Reached!",
+                    EmailBody = $"Moisture threshold ({user.MoistureThreshold}%) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current moisture level: {moistureLevel}%"
+                };
+
+                var emailSent = _mailService.SendMail(mailData);
+                Console.WriteLine($"Email send result: {emailSent}");
+
+                if (emailSent)
+                {
+                    user.LastMoistureAlertSentAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
     }
 }
