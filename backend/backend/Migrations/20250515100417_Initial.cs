@@ -21,7 +21,7 @@ namespace backend.Migrations
                     ArduinoId = table.Column<string>(type: "text", nullable: false),
                     Temperature = table.Column<float>(type: "real", nullable: true),
                     MotionDetected = table.Column<bool>(type: "boolean", nullable: true),
-                    HumidityLevel = table.Column<int>(type: "integer", nullable: true),
+                    HumidityLevel = table.Column<float>(type: "real", nullable: true),
                     Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -40,7 +40,15 @@ namespace backend.Migrations
                     PasswordSalt = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     ArduinoId = table.Column<string>(type: "text", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: false)
+                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
+                    SendEmailAlert = table.Column<bool>(type: "boolean", nullable: false),
+                    LastMotionAlertSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    TemperatureThreshold = table.Column<float>(type: "real", nullable: true),
+                    SendTemperatureAlert = table.Column<bool>(type: "boolean", nullable: false),
+                    LastTemperatureAlertSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    HumidityThreshold = table.Column<float>(type: "real", nullable: true),
+                    SendHumidityAlert = table.Column<bool>(type: "boolean", nullable: false),
+                    LastHumidityAlertSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {

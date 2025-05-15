@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Ellyas\\Documents\\3. GitHub\\H3\\iot-project-guldgruppen\\backend\\backend\\backend.csproj": {}
+    "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Ellyas\\Documents\\3. GitHub\\H3\\iot-project-guldgruppen\\backend\\backend\\backend.csproj": {
+    "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Ellyas\\Documents\\3. GitHub\\H3\\iot-project-guldgruppen\\backend\\backend\\backend.csproj",
+        "projectUniqueName": "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\backend.csproj",
         "projectName": "backend",
-        "projectPath": "C:\\Users\\Ellyas\\Documents\\3. GitHub\\H3\\iot-project-guldgruppen\\backend\\backend\\backend.csproj",
-        "packagesPath": "C:\\Users\\Ellyas\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Ellyas\\Documents\\3. GitHub\\H3\\iot-project-guldgruppen\\backend\\backend\\obj\\",
+        "projectPath": "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\backend.csproj",
+        "packagesPath": "C:\\Users\\sck\\.nuget\\packages\\",
+        "outputPath": "G:\\C-Sharp Code\\H3 - Arduino Project\\iot-project-guldgruppen\\backend\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Ellyas\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sck\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,6 +22,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -39,8 +40,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.200"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -103,19 +103,19 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.13, 8.0.13]"
+              "version": "[8.0.14, 8.0.14]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.13, 8.0.13]"
+              "version": "[8.0.14, 8.0.14]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.13, 8.0.13]"
+              "version": "[8.0.14, 8.0.14]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.13, 8.0.13]"
+              "version": "[8.0.14, 8.0.14]"
             }
           ],
           "frameworkReferences": {
@@ -126,7 +126,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Users\\Ellyas\\.dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

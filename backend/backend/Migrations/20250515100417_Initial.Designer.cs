@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250507171556_Initial")]
+    [Migration("20250515100417_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -36,8 +36,8 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("MoistureLevel")
-                        .HasColumnType("integer");
+                    b.Property<float?>("HumidityLevel")
+                        .HasColumnType("real");
 
                     b.Property<bool?>("MotionDetected")
                         .HasColumnType("boolean");
@@ -69,6 +69,18 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<float?>("HumidityThreshold")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime?>("LastHumidityAlertSentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastMotionAlertSentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastTemperatureAlertSentAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
@@ -80,6 +92,18 @@ namespace backend.Migrations
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("SendEmailAlert")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("SendHumidityAlert")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("SendTemperatureAlert")
+                        .HasColumnType("boolean");
+
+                    b.Property<float?>("TemperatureThreshold")
+                        .HasColumnType("real");
 
                     b.Property<string>("Username")
                         .IsRequired()

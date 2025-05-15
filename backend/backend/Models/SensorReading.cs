@@ -7,7 +7,7 @@ public class SensorReading
     public string ArduinoId { get; set; }
     public float? Temperature { get; set; }
     public bool? MotionDetected { get; set; }
-    public int? HumidityLevel { get; set; }
+    public float? HumidityLevel { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 }
 
@@ -26,7 +26,7 @@ public class MotionReadingDto
 public class HumidityReadingDto
 {
     public string ArduinoId { get; set; }
-    public int HumidityLevel { get; set; }
+    public float HumidityLevel { get; set; }
 }
 
 public class CombinedReadingDto
@@ -34,5 +34,5 @@ public class CombinedReadingDto
     public string ArduinoId { get; set; }
     public float? Temperature { get; set; }
     public bool MotionDetected { get; set; }
-    public int? HumidityLevel { get; set; }
+    public float? HumidityLevel { get; set; }
 }

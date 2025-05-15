@@ -33,8 +33,8 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("HumidityLevel")
-                        .HasColumnType("integer");
+                    b.Property<float?>("HumidityLevel")
+                        .HasColumnType("real");
 
                     b.Property<bool?>("MotionDetected")
                         .HasColumnType("boolean");
@@ -66,6 +66,9 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<float?>("HumidityThreshold")
+                        .HasColumnType("real");
+
                     b.Property<DateTime?>("LastHumidityAlertSentAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -74,9 +77,6 @@ namespace backend.Migrations
 
                     b.Property<DateTime?>("LastTemperatureAlertSentAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("HumidityThreshold")
-                        .HasColumnType("integer");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()

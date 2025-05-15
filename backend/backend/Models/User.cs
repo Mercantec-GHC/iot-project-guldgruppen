@@ -20,7 +20,7 @@ public class User
     public bool SendTemperatureAlert { get; set; } = false;
     public DateTime? LastTemperatureAlertSentAt { get; set; }
     
-    public int? HumidityThreshold { get; set; }
+    public float? HumidityThreshold { get; set; }
     public bool SendHumidityAlert { get; set; } = false;
     public DateTime? LastHumidityAlertSentAt { get; set; }
 }
@@ -38,7 +38,7 @@ public class UserDTO
     
     public float? TemperatureThreshold { get; set; }
     public bool SendTemperatureAlert { get; set; }
-    public int? HumidityThreshold { get; set; }
+    public float? HumidityThreshold { get; set; }
     public bool SendHumidityAlert { get; set; }
 }
 
@@ -77,5 +77,5 @@ public class UpdateTemperatureAlertDto
 public class UpdateHumidityAlertDto
 {
     public bool SendHumidityAlert { get; set; }
-    public int? HumidityThreshold { get; set; }
+    public float? HumidityThreshold { get; set; }
 }

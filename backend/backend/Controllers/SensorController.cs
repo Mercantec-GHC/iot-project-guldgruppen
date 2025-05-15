@@ -108,7 +108,7 @@ public class SensorController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("Humidity")]
+    [HttpPost("humidity")]
     public async Task<IActionResult> PostHumidity([FromBody] HumidityReadingDto dto)
     {
         if (!await IsValidArduinoId(dto.ArduinoId))
@@ -124,7 +124,7 @@ public class SensorController : ControllerBase
         };
         await _repository.UpsertAsync(reading);
 
-        // Check Humidity threshold
+        // Check humidity threshold
         await CheckHumidityThreshold(dto.ArduinoId, dto.HumidityLevel);
 
         return Ok();
@@ -167,7 +167,7 @@ public class SensorController : ControllerBase
         };
         await _repository.UpsertAsync(reading);
 
-        // Check all thresholds
+        // Tjek alle thresholds
         if (dto.Temperature.HasValue)
         {
             await CheckTemperatureThreshold(dto.ArduinoId, dto.Temperature.Value);
@@ -248,26 +248,26 @@ public class SensorController : ControllerBase
         }
     }
 
-    private async Task CheckHumidityThreshold(string arduinoId, int HumidityLevel)
+    private async Task CheckHumidityThreshold(string arduinoId, float humidityLevel)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.ArduinoId == arduinoId);
         if (user == null || !user.SendHumidityAlert || !user.HumidityThreshold.HasValue)
             return;
 
-        if (HumidityLevel >= user.HumidityThreshold.Value)
+        if (humidityLevel >= user.HumidityThreshold.Value)
         {
             var timeSinceLastAlert = DateTime.UtcNow - (user.LastHumidityAlertSentAt ?? DateTime.MinValue);
             var alertCooldown = TimeSpan.FromMinutes(5);
             
             if (timeSinceLastAlert >= alertCooldown)
             {
-                Console.WriteLine("Attempting to send Humidity alert email...");
+                Console.WriteLine("Attempting to send humidity alert email...");
                 var mailData = new MailData
                 {
                     EmailToId = user.Email,
                     EmailToName = user.Username,
                     EmailSubject = "Humidity Threshold Reached!",
-                    EmailBody = $"Humidity threshold ({user.HumidityThreshold}%) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current Humidity level: {HumidityLevel}%"
+                    EmailBody = $"Humidity threshold ({user.HumidityThreshold}%) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current humidity level: {humidityLevel}%"
                 };
 
                 var emailSent = _mailService.SendMail(mailData);

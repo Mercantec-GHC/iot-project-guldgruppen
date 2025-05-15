@@ -8,8 +8,8 @@ MKRIoTCarrier carrier; // Carrier board objekt til sensorer og display
 
 // WiFi indstillinger - kan bruge hardcodede eller gemte credentials
 #define USE_HARDCODED_WIFI true
-const char* HARDCODED_SSID = "iPhone";
-const char* HARDCODED_PASS = "mysamus123";
+const char* HARDCODED_SSID = "Zyxel_BA2F";
+const char* HARDCODED_PASS = "G7QLB4EAMY";
 
 WiFiServer server(80); // Opret en server på port 80
 
@@ -23,11 +23,11 @@ typedef struct {
 FlashStorage(wifiCredsStore, WiFiCredentials);
 
 // Server indstillinger for backend kommunikation
-char serverAddress[] = "172.20.10.2";
+char serverAddress[] = "192.168.1.234";
 int serverPort = 5001;
 
 // Unikt ID for Arduino'en (simulerer en UUID)
-const char* arduinoId = "123e4567-e89b-12d3-a456-426614174000";
+const char* arduinoId = "123e4567-e89b-12d3-a456-426614174001";
 
 WiFiClient wifi; // WiFi klient objekt
 HttpClient client(wifi, serverAddress, serverPort); // HTTP klient
@@ -238,7 +238,7 @@ void sendSensorData(float temp, bool motion, float humidity) {
   String data = "{\"arduinoId\":\"" + String(arduinoId) + "\",";
   data += "\"temperature\":" + String(temp, 2) + ","; // Temperatur med 2 decimaler
   data += "\"motionDetected\":" + String(motion ? "true" : "false") + ",";
-  data += "\"humdityLevel\":" + String(humidity) + "}";
+  data += "\"humidityLevel\":" + String(humidity) + "}";
 
   Serial.println("Sending: " + data); // Debug output
   
