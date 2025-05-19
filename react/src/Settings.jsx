@@ -624,8 +624,8 @@ This is an automated alert from your sensor monitoring system.
 
                         <p className="alert-info">
                             {alertsEnabled
-                                ? `You will receive an email alert when humidity level exceeds ${humidityThreshold}%`
-                                : 'Enable alerts to receive email notifications'}
+                                ? `You will receive an email & SMS alert when humidity level exceeds ${humidityThreshold}%`
+                                : 'Enable alerts to receive email & SMS notifications'}
                         </p>
 
                         <button
@@ -685,8 +685,8 @@ This is an automated alert from your sensor monitoring system.
 
                         <p className="alert-info">
                             {temperatureAlertsEnabled
-                                ? `You will receive an email alert when temperature exceeds ${temperatureThreshold}°C`
-                                : 'Enable alerts to receive email notifications'}
+                                ? `You will receive an email & SMS alert when temperature exceeds ${temperatureThreshold}°C`
+                                : 'Enable alerts to receive email & SMS notifications'}
                         </p>
 
                         <button
@@ -706,9 +706,9 @@ This is an automated alert from your sensor monitoring system.
 
             {/* Motion Detection Email Alerts Sektion */}
             <div className="settings-section">
-                <h3>Motion Detection Email Alerts</h3>
+                <h3>Motion Detection Email & SMS Alerts</h3>
                 <div className="alert-settings">
-                    <p>Configure whether to receive email alerts when motion is detected.</p>
+                    <p>Configure whether to receive email & SMS alerts when motion is detected.</p>
 
                     <div className="form-group">
                         <label className="toggle-label">
@@ -718,15 +718,15 @@ This is an automated alert from your sensor monitoring system.
                                 onChange={(e) => handleToggleMotionAlert(e.target.checked)}
                             />
                             <span className="toggle-text">
-                                {motionAlertEnabled ? 'Email Alerts Enabled' : 'Email Alerts Disabled'}
+                                {motionAlertEnabled ? 'Email & SMS Alerts Enabled' : 'Email & SMS Alerts Disabled'}
                             </span>
                         </label>
                     </div>
 
                     <p className="alert-info">
                         {motionAlertEnabled
-                            ? 'You will receive an email alert when motion is detected'
-                            : 'Enable alerts to receive email notifications when motion is detected'}
+                            ? 'You will receive an email & SMS alert when motion is detected'
+                            : 'Enable alerts to receive email & SMS notifications when motion is detected'}
                     </p>
 
                     {motionAlertMessage && <p className="success-message">{motionAlertMessage}</p>}

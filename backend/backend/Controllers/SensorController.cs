@@ -13,12 +13,14 @@ public class SensorController : ControllerBase
     private readonly ISensorRepository _repository;
     private readonly AppDbContext _context;
     private readonly IMailService _mailService;
+    private readonly IConfiguration _config;
 
-    public SensorController(ISensorRepository repository, AppDbContext context, IMailService mailService)
+    public SensorController(ISensorRepository repository, AppDbContext context, IMailService mailService, IConfiguration config)
     {
         _repository = repository;
         _context = context;
         _mailService = mailService;
+        _config = config;
     }
 
     private async Task<bool> IsValidArduinoId(string arduinoId)
@@ -74,27 +76,33 @@ public class SensorController : ControllerBase
 
         if (dto.MotionDetected && user.SendEmailAlert)
         {
-            // Tjek om der er gået nok tid siden sidste alert
             var timeSinceLastAlert = DateTime.UtcNow - (user.LastMotionAlertSentAt ?? DateTime.MinValue);
-            var alertCooldown = TimeSpan.FromMinutes(5); // 5 minutters cooldown
-        
+            var alertCooldown = TimeSpan.FromMinutes(5);
+    
             if (timeSinceLastAlert >= alertCooldown)
             {
-                Console.WriteLine("Attempting to send email notification...");
+                Console.WriteLine("Attempting to send notifications...");
+                var alertMessage = $"Movement was detected by your sensor (Arduino ID: {dto.ArduinoId}) at {DateTime.UtcNow.ToString("g")}";
+        
+                // Send email
                 var mailData = new MailData
                 {
                     EmailToId = user.Email,
                     EmailToName = user.Username,
                     EmailSubject = "Movement Detected!",
-                    EmailBody = $"Movement was detected by your sensor (Arduino ID: {dto.ArduinoId}) at {DateTime.UtcNow.ToString("g")}"
+                    EmailBody = alertMessage
                 };
-
                 var emailSent = _mailService.SendMail(mailData);
-                Console.WriteLine($"Email send result: {emailSent}");
-
-                if (emailSent)
+        
+                // Send SMS if phone number exists
+                var smsSent = true;
+                if (!string.IsNullOrEmpty(user.PhoneNumber))
                 {
-                    // Update den sidste alert tid kun hvis email blev sendt
+                    smsSent = await SendAlertSms(user, alertMessage);
+                }
+
+                if (emailSent || smsSent)
+                {
                     user.LastMotionAlertSentAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
                 }
@@ -167,12 +175,12 @@ public class SensorController : ControllerBase
         };
         await _repository.UpsertAsync(reading);
 
-        // Tjek alle thresholds
+        // Check all thresholds
         if (dto.Temperature.HasValue)
         {
             await CheckTemperatureThreshold(dto.ArduinoId, dto.Temperature.Value);
         }
-    
+
         if (dto.HumidityLevel.HasValue)
         {
             await CheckHumidityThreshold(dto.ArduinoId, dto.HumidityLevel.Value);
@@ -180,27 +188,33 @@ public class SensorController : ControllerBase
 
         if (dto.MotionDetected && user.SendEmailAlert)
         {
-            // Tjek om der er gået nok tid siden sidste alert
             var timeSinceLastAlert = DateTime.UtcNow - (user.LastMotionAlertSentAt ?? DateTime.MinValue);
-            var alertCooldown = TimeSpan.FromMinutes(5); // 5 minutters cooldown
+            var alertCooldown = TimeSpan.FromMinutes(5); // 5 minute cooldown
             
             if (timeSinceLastAlert >= alertCooldown)
             {
-                Console.WriteLine("Attempting to send email notification from combined reading...");
+                Console.WriteLine("Attempting to send motion notifications from combined reading...");
+                var alertMessage = $"Movement was detected by your sensor (Arduino ID: {dto.ArduinoId}) at {DateTime.UtcNow.ToString("g")}";
+                
+                // Send email
                 var mailData = new MailData
                 {
                     EmailToId = user.Email,
                     EmailToName = user.Username,
                     EmailSubject = "Movement Detected!",
-                    EmailBody = $"Movement was detected by your sensor (Arduino ID: {dto.ArduinoId}) at {DateTime.UtcNow.ToString("g")}"
+                    EmailBody = alertMessage
                 };
-
                 var emailSent = _mailService.SendMail(mailData);
-                Console.WriteLine($"Email send result: {emailSent}");
-
-                if (emailSent)
+                
+                // Send SMS if phone number exists
+                var smsSent = true;
+                if (!string.IsNullOrEmpty(user.PhoneNumber))
                 {
-                    // Update den sidste alert tid kun hvis email blev sendt
+                    smsSent = await SendAlertSms(user, alertMessage);
+                }
+
+                if (emailSent || smsSent)
+                {
                     user.LastMotionAlertSentAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
                 }
@@ -214,7 +228,7 @@ public class SensorController : ControllerBase
         return Ok();
     }
     
-        private async Task CheckTemperatureThreshold(string arduinoId, float temperature)
+    private async Task CheckTemperatureThreshold(string arduinoId, float temperature)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.ArduinoId == arduinoId);
         if (user == null || !user.SendTemperatureAlert || !user.TemperatureThreshold.HasValue)
@@ -224,22 +238,30 @@ public class SensorController : ControllerBase
         {
             var timeSinceLastAlert = DateTime.UtcNow - (user.LastTemperatureAlertSentAt ?? DateTime.MinValue);
             var alertCooldown = TimeSpan.FromMinutes(5);
-            
+        
             if (timeSinceLastAlert >= alertCooldown)
             {
-                Console.WriteLine("Attempting to send temperature alert email...");
+                Console.WriteLine("Attempting to send temperature notifications...");
+                var alertMessage = $"Temperature threshold ({user.TemperatureThreshold}°C) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current temperature: {temperature}°C";
+            
+                // Send email
                 var mailData = new MailData
                 {
                     EmailToId = user.Email,
                     EmailToName = user.Username,
                     EmailSubject = "Temperature Threshold Reached!",
-                    EmailBody = $"Temperature threshold ({user.TemperatureThreshold}°C) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current temperature: {temperature}°C"
+                    EmailBody = alertMessage
                 };
-
                 var emailSent = _mailService.SendMail(mailData);
-                Console.WriteLine($"Email send result: {emailSent}");
+            
+                // Send SMS if phone number exists
+                var smsSent = true;
+                if (!string.IsNullOrEmpty(user.PhoneNumber))
+                {
+                    smsSent = await SendAlertSms(user, alertMessage);
+                }
 
-                if (emailSent)
+                if (emailSent || smsSent)
                 {
                     user.LastTemperatureAlertSentAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
@@ -258,27 +280,55 @@ public class SensorController : ControllerBase
         {
             var timeSinceLastAlert = DateTime.UtcNow - (user.LastHumidityAlertSentAt ?? DateTime.MinValue);
             var alertCooldown = TimeSpan.FromMinutes(5);
-            
+        
             if (timeSinceLastAlert >= alertCooldown)
             {
-                Console.WriteLine("Attempting to send humidity alert email...");
+                Console.WriteLine("Attempting to send humidity notifications...");
+                var alertMessage = $"Humidity threshold ({user.HumidityThreshold}%) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current humidity level: {humidityLevel}%";
+            
+                // Send email
                 var mailData = new MailData
                 {
                     EmailToId = user.Email,
                     EmailToName = user.Username,
                     EmailSubject = "Humidity Threshold Reached!",
-                    EmailBody = $"Humidity threshold ({user.HumidityThreshold}%) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current humidity level: {humidityLevel}%"
+                    EmailBody = alertMessage
                 };
-
                 var emailSent = _mailService.SendMail(mailData);
-                Console.WriteLine($"Email send result: {emailSent}");
+            
+                // Send SMS if phone number exists
+                var smsSent = true;
+                if (!string.IsNullOrEmpty(user.PhoneNumber))
+                {
+                    smsSent = await SendAlertSms(user, alertMessage);
+                }
 
-                if (emailSent)
+                if (emailSent || smsSent)
                 {
                     user.LastHumidityAlertSentAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
                 }
             }
+        }
+    }
+    
+    private async Task<bool> SendAlertSms(User user, string message)
+    {
+        try
+        {
+            var smsRequest = new SmsRequest
+            {
+                To = user.PhoneNumber,
+                Message = message
+            };
+
+            var smsController = new SmsController(_config);
+            var result = smsController.SendSms(smsRequest);
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 }
