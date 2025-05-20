@@ -18,11 +18,16 @@ public class User
     
     public float? TemperatureThreshold { get; set; }
     public bool SendTemperatureAlert { get; set; } = false;
-    public DateTime? LastTemperatureAlertSentAt { get; set; }
+    
     
     public float? HumidityThreshold { get; set; }
     public bool SendHumidityAlert { get; set; } = false;
-    public DateTime? LastHumidityAlertSentAt { get; set; }
+    
+    public DateTime? LastTemperatureEmailSentAt { get; set; }
+    public DateTime? LastTemperatureSmsSentAt { get; set; }
+    public DateTime? LastHumidityEmailSentAt { get; set; }
+    public DateTime? LastHumiditySmsSentAt { get; set; }
+
 }
 
 public class UserDTO

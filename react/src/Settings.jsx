@@ -238,108 +238,6 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
         }
     };
 
-    // Funktion til at sende temperature alert email
-    const sendTemperatureAlertEmail = async (currentTemperature, email, name) => {
-        try {
-            if (!email) {
-                throw new Error('User email not available');
-            }
-
-            const numericTemperature = Number(currentTemperature);
-            const numericThreshold = Number(temperatureThreshold);
-
-            console.log('Sending temperature alert with values:', {
-                temperature: numericTemperature,
-                threshold: numericThreshold
-            });
-
-            // Formater alert email body
-            const emailBody = `
-Alert: Temperature Threshold Exceeded!
-------------------------------------------
-Current Temperature: ${numericTemperature}°C
-Your Threshold Setting: ${numericThreshold}°C
-
-This is an automated alert from your sensor monitoring system.
-            `.trim();
-
-            // Send email via API endpoint
-            const response = await fetch('http://localhost:5001/Mail', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'accept': 'text/plain'
-                },
-                body: JSON.stringify({
-                    emailToId: email,
-                    emailToName: name,
-                    emailSubject: 'ALERT: Temperature Threshold Exceeded',
-                    emailBody: emailBody
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(errorData || 'Failed to send temperature alert email');
-            }
-
-            console.log('Temperature alert email sent successfully');
-        } catch (err) {
-            console.error('Temperature alert email sending error:', err);
-        }
-    };
-
-    // Funktion til at sende alert email
-    const sendAlertEmail = async (currentHumidityLevel, email, name) => {
-        try {
-            if (!email) {
-                throw new Error('User email not available');
-            }
-
-            const numericHumidityLevel = Number(currentHumidityLevel);
-            const numericThreshold = Number(humidityThreshold);
-
-            console.log('Sending alert with values:', {
-                humidityLevel: numericHumidityLevel,
-                threshold: numericThreshold
-            });
-
-            // Formater alert email body
-            const emailBody = `
-Alert: Humidity Level Threshold Exceeded!
-------------------------------------------
-Current Humidity Level: ${numericHumidityLevel}%
-Your Threshold Setting: ${numericThreshold}%
-
-This is an automated alert from your sensor monitoring system.
-            `.trim();
-
-            // Send email via API endpoint
-            const response = await fetch('http://localhost:5001/Mail', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'accept': 'text/plain'
-                },
-                body: JSON.stringify({
-                    emailToId: email,
-                    emailToName: name,
-                    emailSubject: 'ALERT: Humidity Level Threshold Exceeded',
-                    emailBody: emailBody
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(errorData || 'Failed to send alert email');
-            }
-
-            console.log('Alert email sent successfully');
-        } catch (err) {
-            console.error('Alert email sending error:', err);
-        }
-    };
-
     // Forskellige useEffect til at fetche user og sensor data
     useEffect(() => {
         const fetchUserAndSensorData = async () => {
@@ -448,7 +346,7 @@ This is an automated alert from your sensor monitoring system.
                     const newSensorData = sensorArray[0];
                     setSensorData(newSensorData);
 
-                    // Konverter værdier til numre for at sikre korrekt sammenligning
+                    // Just log the threshold checks without sending emails
                     const currentHumidityLevel = newSensorData ? Number(newSensorData.humidityLevel) : 0;
                     const humidityThresholdValue = Number(humidityThreshold);
 
@@ -461,19 +359,7 @@ This is an automated alert from your sensor monitoring system.
                         meetsOrExceedsThreshold: currentHumidityLevel >= humidityThresholdValue
                     });
 
-                    // Tjek om alerts er slået til og humidity level når eller overstiger threshold
-                    if (alertsEnabled && newSensorData &&
-                        (currentHumidityLevel >= humidityThresholdValue)) {
-                        console.log('Sending humidity alert email!');
-                        // Send en alert email hver gang threshold nås eller overskrider
-                        sendAlertEmail(
-                            currentHumidityLevel,
-                            userData.email,
-                            userData.username || userData.name || 'User'
-                        );
-                    }
-
-                    // Tjek om temperature alerts er slået til og temperature threshold er nået
+                    // Just log the temperature checks without sending emails
                     const currentTemperature = newSensorData ? Number(newSensorData.temperature) : 0;
                     const temperatureThresholdValue = Number(temperatureThreshold);
 
@@ -485,18 +371,6 @@ This is an automated alert from your sensor monitoring system.
                         exceedsThreshold: currentTemperature > temperatureThresholdValue,
                         meetsOrExceedsThreshold: currentTemperature >= temperatureThresholdValue
                     });
-
-                    // Tjek om temperature alerts er slået til og temperature når eller overstiger threshold
-                    if (temperatureAlertsEnabled && newSensorData &&
-                        (currentTemperature >= temperatureThresholdValue)) {
-                        console.log('Sending temperature alert email!');
-                        // Send en alert email hver gang threshold nås eller overskrider
-                        sendTemperatureAlertEmail(
-                            currentTemperature,
-                            userData.email,
-                            userData.username || userData.name || 'User'
-                        );
-                    }
                 }
             } catch (error) {
                 console.error('Error in fetching process:', error);

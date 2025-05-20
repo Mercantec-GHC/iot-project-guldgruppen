@@ -227,6 +227,7 @@ public class SensorController : ControllerBase
 
         return Ok();
     }
+
     
     private async Task CheckTemperatureThreshold(string arduinoId, float temperature)
     {
@@ -236,15 +237,20 @@ public class SensorController : ControllerBase
 
         if (temperature >= user.TemperatureThreshold.Value)
         {
-            var timeSinceLastAlert = DateTime.UtcNow - (user.LastTemperatureAlertSentAt ?? DateTime.MinValue);
-            var alertCooldown = TimeSpan.FromMinutes(5);
-        
-            if (timeSinceLastAlert >= alertCooldown)
+            var currentTime = DateTime.UtcNow;
+            var emailCooldown = TimeSpan.FromMinutes(5);
+            var smsCooldown = TimeSpan.FromMinutes(5);
+
+            var timeSinceLastEmail = currentTime - (user.LastTemperatureEmailSentAt ?? DateTime.MinValue);
+            var timeSinceLastSms = currentTime - (user.LastTemperatureSmsSentAt ?? DateTime.MinValue);
+
+            var alertMessage = $"Temperature threshold ({user.TemperatureThreshold}°C) was reached by your sensor (Arduino ID: {arduinoId}) at {currentTime:g}. Current temperature: {temperature}°C";
+
+            bool emailSent = false, smsSent = false;
+
+            if (timeSinceLastEmail >= emailCooldown)
             {
-                Console.WriteLine("Attempting to send temperature notifications...");
-                var alertMessage = $"Temperature threshold ({user.TemperatureThreshold}°C) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current temperature: {temperature}°C";
-            
-                // Send email
+                Console.WriteLine("Sending temperature email...");
                 var mailData = new MailData
                 {
                     EmailToId = user.Email,
@@ -252,23 +258,33 @@ public class SensorController : ControllerBase
                     EmailSubject = "Temperature Threshold Reached!",
                     EmailBody = alertMessage
                 };
-                var emailSent = _mailService.SendMail(mailData);
-            
-                // Send SMS if phone number exists
-                var smsSent = true;
-                if (!string.IsNullOrEmpty(user.PhoneNumber))
-                {
-                    smsSent = await SendAlertSms(user, alertMessage);
-                }
-
-                if (emailSent || smsSent)
-                {
-                    user.LastTemperatureAlertSentAt = DateTime.UtcNow;
-                    await _context.SaveChangesAsync();
-                }
+                emailSent = _mailService.SendMail(mailData);
             }
+            else
+            {
+                Console.WriteLine($"Email not sent - cooldown active. Time remaining: {emailCooldown - timeSinceLastEmail}");
+            }
+
+            if (!string.IsNullOrEmpty(user.PhoneNumber) && timeSinceLastSms >= smsCooldown)
+            {
+                Console.WriteLine("Sending temperature SMS...");
+                smsSent = await SendAlertSms(user, alertMessage);
+            }
+            else
+            {
+                Console.WriteLine($"SMS not sent - cooldown active. Time remaining: {smsCooldown - timeSinceLastSms}");
+            }
+
+            if (emailSent)
+                user.LastTemperatureEmailSentAt = currentTime;
+            if (smsSent)
+                user.LastTemperatureSmsSentAt = currentTime;
+
+            await _context.SaveChangesAsync();
         }
     }
+
+
 
     private async Task CheckHumidityThreshold(string arduinoId, float humidityLevel)
     {
@@ -278,15 +294,20 @@ public class SensorController : ControllerBase
 
         if (humidityLevel >= user.HumidityThreshold.Value)
         {
-            var timeSinceLastAlert = DateTime.UtcNow - (user.LastHumidityAlertSentAt ?? DateTime.MinValue);
-            var alertCooldown = TimeSpan.FromMinutes(5);
-        
-            if (timeSinceLastAlert >= alertCooldown)
+            var currentTime = DateTime.UtcNow;
+            var emailCooldown = TimeSpan.FromMinutes(5);
+            var smsCooldown = TimeSpan.FromMinutes(5);
+
+            var timeSinceLastEmail = currentTime - (user.LastHumidityEmailSentAt ?? DateTime.MinValue);
+            var timeSinceLastSms = currentTime - (user.LastHumiditySmsSentAt ?? DateTime.MinValue);
+
+            var alertMessage = $"Humidity threshold ({user.HumidityThreshold}%) reached by your sensor (Arduino ID: {arduinoId}) at {currentTime:g}. Current humidity: {humidityLevel}%";
+
+            bool emailSent = false, smsSent = false;
+
+            if (timeSinceLastEmail >= emailCooldown)
             {
-                Console.WriteLine("Attempting to send humidity notifications...");
-                var alertMessage = $"Humidity threshold ({user.HumidityThreshold}%) was reached by your sensor (Arduino ID: {arduinoId}) at {DateTime.UtcNow.ToString("g")}. Current humidity level: {humidityLevel}%";
-            
-                // Send email
+                Console.WriteLine("Sending humidity email...");
                 var mailData = new MailData
                 {
                     EmailToId = user.Email,
@@ -294,23 +315,33 @@ public class SensorController : ControllerBase
                     EmailSubject = "Humidity Threshold Reached!",
                     EmailBody = alertMessage
                 };
-                var emailSent = _mailService.SendMail(mailData);
-            
-                // Send SMS if phone number exists
-                var smsSent = true;
-                if (!string.IsNullOrEmpty(user.PhoneNumber))
-                {
-                    smsSent = await SendAlertSms(user, alertMessage);
-                }
-
-                if (emailSent || smsSent)
-                {
-                    user.LastHumidityAlertSentAt = DateTime.UtcNow;
-                    await _context.SaveChangesAsync();
-                }
+                emailSent = _mailService.SendMail(mailData);
             }
+            else
+            {
+                Console.WriteLine($"Email not sent - cooldown active. Time remaining: {emailCooldown - timeSinceLastEmail}");
+            }
+
+            if (!string.IsNullOrEmpty(user.PhoneNumber) && timeSinceLastSms >= smsCooldown)
+            {
+                Console.WriteLine("Sending humidity SMS...");
+                smsSent = await SendAlertSms(user, alertMessage);
+            }
+            else
+            {
+                Console.WriteLine($"SMS not sent - cooldown active. Time remaining: {smsCooldown - timeSinceLastSms}");
+            }
+
+            if (emailSent)
+                user.LastHumidityEmailSentAt = currentTime;
+            if (smsSent)
+                user.LastHumiditySmsSentAt = currentTime;
+
+            await _context.SaveChangesAsync();
         }
     }
+
+
     
     private async Task<bool> SendAlertSms(User user, string message)
     {

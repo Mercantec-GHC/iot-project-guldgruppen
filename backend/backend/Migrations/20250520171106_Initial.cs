@@ -45,10 +45,12 @@ namespace backend.Migrations
                     LastMotionAlertSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     TemperatureThreshold = table.Column<float>(type: "real", nullable: true),
                     SendTemperatureAlert = table.Column<bool>(type: "boolean", nullable: false),
-                    LastTemperatureAlertSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     HumidityThreshold = table.Column<float>(type: "real", nullable: true),
                     SendHumidityAlert = table.Column<bool>(type: "boolean", nullable: false),
-                    LastHumidityAlertSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    LastTemperatureEmailSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastTemperatureSmsSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastHumidityEmailSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastHumiditySmsSentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250515104730_Initial")]
+    [Migration("20250520171106_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -72,13 +72,19 @@ namespace backend.Migrations
                     b.Property<float?>("HumidityThreshold")
                         .HasColumnType("real");
 
-                    b.Property<DateTime?>("LastHumidityAlertSentAt")
+                    b.Property<DateTime?>("LastHumidityEmailSentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastHumiditySmsSentAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("LastMotionAlertSentAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("LastTemperatureAlertSentAt")
+                    b.Property<DateTime?>("LastTemperatureEmailSentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastTemperatureSmsSentAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PasswordHash")

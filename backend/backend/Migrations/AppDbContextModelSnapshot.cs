@@ -69,13 +69,19 @@ namespace backend.Migrations
                     b.Property<float?>("HumidityThreshold")
                         .HasColumnType("real");
 
-                    b.Property<DateTime?>("LastHumidityAlertSentAt")
+                    b.Property<DateTime?>("LastHumidityEmailSentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastHumiditySmsSentAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("LastMotionAlertSentAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("LastTemperatureAlertSentAt")
+                    b.Property<DateTime?>("LastTemperatureEmailSentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastTemperatureSmsSentAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PasswordHash")
