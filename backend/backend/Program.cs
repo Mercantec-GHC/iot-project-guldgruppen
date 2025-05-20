@@ -9,7 +9,7 @@ using backend.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure server URLs
-builder.WebHost.UseUrls("http://0.0.0.0:5001");
+builder.WebHost.UseUrls("http://0.0.0.0:5001"); 
 
 // Add database context
 builder.Services.AddDbContext<AppDbContext>(options =>
