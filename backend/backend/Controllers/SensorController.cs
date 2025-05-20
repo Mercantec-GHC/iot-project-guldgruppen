@@ -10,11 +10,13 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class SensorController : ControllerBase
 {
+    // Dependency injections
     private readonly ISensorRepository _repository;
     private readonly AppDbContext _context;
     private readonly IMailService _mailService;
     private readonly IConfiguration _config;
 
+    // Constructor med dependency injection
     public SensorController(ISensorRepository repository, AppDbContext context, IMailService mailService, IConfiguration config)
     {
         _repository = repository;
@@ -23,11 +25,13 @@ public class SensorController : ControllerBase
         _config = config;
     }
 
+    // Tjekker om et ArduinoId er gyldig (findes i databasen)
     private async Task<bool> IsValidArduinoId(string arduinoId)
     {
         return await _context.Users.AnyAsync(u => u.ArduinoId == arduinoId);
     }
 
+    // Endpoint for at modtage temperaturdata
     [HttpPost("temperature")]
     public async Task<IActionResult> PostTemperature([FromBody] TemperatureReadingDto dto)
     {
@@ -36,6 +40,7 @@ public class SensorController : ControllerBase
             return BadRequest("Invalid ArduinoId.");
         }
 
+        // Opretter et nyt SensorReading objekt
         var reading = new SensorReading
         {
             ArduinoId = dto.ArduinoId,
@@ -44,12 +49,13 @@ public class SensorController : ControllerBase
         };
         await _repository.UpsertAsync(reading);
 
-        // Check temperature threshold
+        // Tjekker om temperaturen overstiger en grænseværdi
         await CheckTemperatureThreshold(dto.ArduinoId, dto.Temperature);
 
         return Ok();
     }
 
+    // Endpoint for at modtage bevægelsesdata
     [HttpPost("motion")]
     public async Task<IActionResult> PostMotion([FromBody] MotionReadingDto dto)
     {
@@ -58,6 +64,7 @@ public class SensorController : ControllerBase
             return BadRequest("Invalid ArduinoId.");
         }
 
+        // Finder brugeren der hører til ArduinoId
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.ArduinoId == dto.ArduinoId);
 
@@ -66,6 +73,7 @@ public class SensorController : ControllerBase
             return BadRequest("No user found for this ArduinoId.");
         }
 
+        // Opretter et nyt SensorReading objekt
         var reading = new SensorReading
         {
             ArduinoId = dto.ArduinoId,
@@ -74,10 +82,11 @@ public class SensorController : ControllerBase
         };
         await _repository.UpsertAsync(reading);
 
+        // Hvis der er bevægelse og brugeren vil have besked
         if (dto.MotionDetected && user.SendEmailAlert)
         {
             var timeSinceLastAlert = DateTime.UtcNow - (user.LastMotionAlertSentAt ?? DateTime.MinValue);
-            var alertCooldown = TimeSpan.FromMinutes(5);
+            var alertCooldown = TimeSpan.FromMinutes(5); // 5 minutters cooldown
     
             if (timeSinceLastAlert >= alertCooldown)
             {
@@ -94,7 +103,7 @@ public class SensorController : ControllerBase
                 };
                 var emailSent = _mailService.SendMail(mailData);
         
-                // Send SMS if phone number exists
+                // Send SMS hvis telefonnummer findes
                 var smsSent = true;
                 if (!string.IsNullOrEmpty(user.PhoneNumber))
                 {
@@ -116,6 +125,7 @@ public class SensorController : ControllerBase
         return Ok();
     }
 
+    // Endpoint for at modtage fugtighedsdata
     [HttpPost("humidity")]
     public async Task<IActionResult> PostHumidity([FromBody] HumidityReadingDto dto)
     {
@@ -124,6 +134,7 @@ public class SensorController : ControllerBase
             return BadRequest("Invalid ArduinoId.");
         }
 
+        // Opretter et nyt SensorReading objekt
         var reading = new SensorReading
         {
             ArduinoId = dto.ArduinoId,
@@ -132,12 +143,13 @@ public class SensorController : ControllerBase
         };
         await _repository.UpsertAsync(reading);
 
-        // Check humidity threshold
+        // Tjekker om fugtigheden overstiger en grænseværdi
         await CheckHumidityThreshold(dto.ArduinoId, dto.HumidityLevel);
 
         return Ok();
     }
     
+    // Endpoint for at hente alle målinger for et ArduinoId
     [HttpGet("{arduinoId}")]
     public async Task<IActionResult> GetByArduinoId(string arduinoId)
     {
@@ -149,6 +161,7 @@ public class SensorController : ControllerBase
         return Ok(readings);
     }
 
+    // Endpoint for at modtage kombineret data (temperatur, bevægelse, fugtighed)
     [HttpPost("reading")]
     public async Task<IActionResult> PostCombinedReading([FromBody] CombinedReadingDto dto)
     {
@@ -157,6 +170,7 @@ public class SensorController : ControllerBase
             return BadRequest("Invalid ArduinoId.");
         }
 
+        // Finder brugeren der hører til ArduinoId
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.ArduinoId == dto.ArduinoId);
 
@@ -165,6 +179,7 @@ public class SensorController : ControllerBase
             return BadRequest("No user found for this ArduinoId.");
         }
 
+        // Opretter et nyt SensorReading objekt med alle data
         var reading = new SensorReading
         {
             ArduinoId = dto.ArduinoId,
@@ -175,7 +190,7 @@ public class SensorController : ControllerBase
         };
         await _repository.UpsertAsync(reading);
 
-        // Check all thresholds
+        // Tjekker alle grænseværdier
         if (dto.Temperature.HasValue)
         {
             await CheckTemperatureThreshold(dto.ArduinoId, dto.Temperature.Value);
@@ -186,10 +201,11 @@ public class SensorController : ControllerBase
             await CheckHumidityThreshold(dto.ArduinoId, dto.HumidityLevel.Value);
         }
 
+        // Hvis der er bevægelse og brugeren vil have besked
         if (dto.MotionDetected && user.SendEmailAlert)
         {
             var timeSinceLastAlert = DateTime.UtcNow - (user.LastMotionAlertSentAt ?? DateTime.MinValue);
-            var alertCooldown = TimeSpan.FromMinutes(5); // 5 minute cooldown
+            var alertCooldown = TimeSpan.FromMinutes(5); // 5 minutters cooldown
             
             if (timeSinceLastAlert >= alertCooldown)
             {
@@ -206,7 +222,7 @@ public class SensorController : ControllerBase
                 };
                 var emailSent = _mailService.SendMail(mailData);
                 
-                // Send SMS if phone number exists
+                // Send SMS hvis telefonnummer findes
                 var smsSent = true;
                 if (!string.IsNullOrEmpty(user.PhoneNumber))
                 {
@@ -228,7 +244,7 @@ public class SensorController : ControllerBase
         return Ok();
     }
 
-    
+    // Tjekker om temperatur grænseværdi er overskredet og sender besked hvis nødvendigt
     private async Task CheckTemperatureThreshold(string arduinoId, float temperature)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.ArduinoId == arduinoId);
@@ -284,8 +300,7 @@ public class SensorController : ControllerBase
         }
     }
 
-
-
+    // Tjekker om fugtigheds grænseværdi er overskredet og sender besked hvis nødvendigt
     private async Task CheckHumidityThreshold(string arduinoId, float humidityLevel)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.ArduinoId == arduinoId);
@@ -340,9 +355,8 @@ public class SensorController : ControllerBase
             await _context.SaveChangesAsync();
         }
     }
-
-
     
+    // Hjælpemetode til at sende SMS beskeder
     private async Task<bool> SendAlertSms(User user, string message)
     {
         try

@@ -9,7 +9,7 @@ namespace backend.Controllers;
 [Route("[controller]")]
 public class MailController : ControllerBase
 {
-    // Referance til mail servicen - bruges til at sende mails.
+    // Reference til mail servicen - bruges til at sende mails.
     private readonly IMailService Mail_Service;
     private readonly AppDbContext _context;
 
