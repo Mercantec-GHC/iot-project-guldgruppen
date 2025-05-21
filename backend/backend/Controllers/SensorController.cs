@@ -149,7 +149,7 @@ public class SensorController : ControllerBase
         return Ok();
     }
     
-    // Endpoint for at hente alle målinger for et ArduinoId
+    // Endpoint for at hente alle målinger for et ArduinoId HER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     [HttpGet("{arduinoId}")]
     public async Task<IActionResult> GetByArduinoId(string arduinoId)
     {

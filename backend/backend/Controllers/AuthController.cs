@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
         _jwtTokenService = jwtTokenService;
     }
 
-    // POST: api/Auth/register
+    // POST: api/Auth/register //HER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserDtoRegister request)
     {
@@ -52,7 +52,7 @@ public class AuthController : ControllerBase
         return CreatedAtAction(nameof(Register), new { id = user.id }, user);
     }
 
-    // POST: api/Auth/login
+    // POST: api/Auth/login  //HER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserDtoLogin request)
     {

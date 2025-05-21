@@ -33,7 +33,7 @@ public class UsersController : ControllerBase
         return Ok(users);
     }
 
-    // GET: api/Users/{id}
+    // GET: api/Users/{id} HER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Henter en specifik bruger ud fra ID
     [HttpGet("{id}")]
     public async Task<ActionResult<UserDTO>> GetUserById(int id)
