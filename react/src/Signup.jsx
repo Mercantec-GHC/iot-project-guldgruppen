@@ -17,8 +17,6 @@ function SignUp() {
             ? '123e4567-e89b-12d3-a456-426614174000'
             : region === 'Skive1'
                 ? '123e4567-e89b-12d3-a456-426614174001'
-                : region === 'Skive2'
-                    ? '123e4567-e89b-12d3-a456-426614174002'
                     : region === 'Aalborg'
                         ? '123e4567-e89b-12d3-a456-426614174003'
                         : '';
@@ -119,8 +117,7 @@ function SignUp() {
                         onChange={(e) => setRegion(e.target.value)}
                     >
                         <option value="Copenhagen">Copenhagen</option>
-                        <option value="Skive1">Skive1</option>
-                        <option value="Skive2">Skive2</option>
+                        <option value="Skive1">Skive</option>
                         <option value="Aalborg">Aalborg</option>
                     </select>
                 </div>
