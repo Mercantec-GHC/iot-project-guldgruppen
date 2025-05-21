@@ -123,9 +123,9 @@ function SensorData() {
                 </div>
             </div>
             {arduinoId ? (
-                <p>Fetching data for Arduino ID: <strong>{arduinoId}</strong></p>
+                <p style={{ color: 'white' }}>Fetching data for Arduino ID: <strong>{arduinoId}</strong></p>
             ) : (
-                <p>Loading user and sensor data...</p>
+                <p style={{ color: 'white' }}>Loading user and sensor data...</p>
             )}
             <div className="sensor-gauges">
                 <div className="temperature-gauge">
