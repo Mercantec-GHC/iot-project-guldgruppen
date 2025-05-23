@@ -123,7 +123,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
         }
     };
 
-    // Funktion til at håndtere at gemme alert settings
+    // Funktion til at gemme alert settings
     const handleSaveAlertSettings = async () => {
         setAlertMessage('');
         setAlertError('');
@@ -162,7 +162,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
         }
     };
 
-    // Funktion til at håndtere at gemme temperature alert settings
+    // Funktion til at gemme temperature alert settings
     const handleSaveTemperatureAlertSettings = async () => {
         setTemperatureAlertMessage('');
         setTemperatureAlertError('');
@@ -201,7 +201,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
         }
     };
 
-    // Funktion til at håndtere toggle motion detect email alerts
+    // Funktion til at toggle motion detect email alerts
     const handleToggleMotionAlert = async (enabled) => {
         setMotionAlertMessage('');
         setMotionAlertError('');
