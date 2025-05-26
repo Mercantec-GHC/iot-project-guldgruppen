@@ -11,6 +11,19 @@ MKRIoTCarrier carrier; // Carrier board objekt til sensorer og display
 const char* HARDCODED_SSID = "Zyxel_BA2F";
 const char* HARDCODED_PASS = "G7QLB4EAMY";
 
+
+
+
+
+// ** WEBSERVER START ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+// ** WEBSERVER START ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+// ** WEBSERVER START ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+// ** WEBSERVER START ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+// ** WEBSERVER START ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+
+
+
+
 WiFiServer server(80); // Opret en server på port 80
 
 // Struct til at gemme WiFi loginoplysninger
@@ -21,6 +34,79 @@ typedef struct {
 
 // Flash-lager til at gemme WiFi credentials (beholder data ved genstart)
 FlashStorage(wifiCredsStore, WiFiCredentials);
+
+// Hjælpefunktion til at udtrække parametre fra URL
+String getParam(String request, String key) {
+  int start = request.indexOf(key + "="); // Find start af parameter
+  if (start == -1) return ""; // Hvis ikke fundet, returner tom streng
+  start += key.length() + 1; // Flyt markør til efter '='
+  int end = request.indexOf('&', start); // Find slutningen (enten & eller mellemrum)
+  if (end == -1) end = request.indexOf(' ', start);
+  return request.substring(start, end); // Returner parameter værdi
+}
+
+// Håndter WiFi konfigurationsportal når i AP mode
+void handleSetupPortal() {
+  WiFiClient client = server.available(); // Tjek for indkomne forbindelser
+  if (client) {
+    String request = client.readStringUntil('\r'); // Læs HTTP request
+    client.flush();
+
+    // Hvis request indeholder /save? (form submission)
+    if (request.indexOf("/save?") != -1) {
+      // Udtræk SSID og password fra URL parametre
+      String ssid = getParam(request, "ssid");
+      String pass = getParam(request, "pass");
+      
+      // Hvis både SSID og password er angivet, gem dem i flash
+      if (ssid.length() > 0 && pass.length() > 0) {
+        WiFiCredentials creds;
+        ssid.toCharArray(creds.ssid, 32); // Kopier SSID til struct
+        pass.toCharArray(creds.pass, 64); // Kopier password til struct
+        wifiCredsStore.write(creds); // Gem i flash-lager
+        
+        // Send svar til browseren
+        client.println("HTTP/1.1 200 OK");
+        client.println("Content-Type: text/html");
+        client.println();
+        client.println("<h1>Saved. Rebooting...</h1>");
+        delay(2000);
+        NVIC_SystemReset(); // Genstart Arduino
+      }
+    } else {
+      // Vis WiFi konfigurationsformular
+      client.println("HTTP/1.1 200 OK");
+      client.println("Content-Type: text/html");
+      client.println();
+      client.println("<h1>WiFi Setup</h1>");
+      client.println("<form action='/save' method='GET'>");
+      client.println("SSID: <input name='ssid'><br>");
+      client.println("Password: <input name='pass' type='password'><br>");
+      client.println("<input type='submit' value='Save'>");
+      client.println("</form>");
+    }
+    client.stop(); // Luk forbindelsen
+  }
+}
+
+
+
+
+// ** WEBSERVER SLUT ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+// ** WEBSERVER SLUT ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+// ** WEBSERVER SLUT ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+// ** WEBSERVER SLUT ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+// ** WEBSERVER SLUT ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+// ** WEBSERVER SLUT ** // ** SETUP PART PÅ LINJE 224 ** // ** LOOP PART PÅ LINJE 248 ** // 
+
+
+
+
+
+
+
+
+
 
 // Server indstillinger for backend kommunikation
 char serverAddress[] = "192.168.1.234";
@@ -126,21 +212,54 @@ void setup() {
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
   } else {
-    // Hvis ikke forbundet, start som access point til konfiguration
+
+
+
+    // ** WEBSERVER PART START ** //
+    // ** WEBSERVER PART START ** //
+    // ** WEBSERVER PART START ** //
+
+
+    // Hvis ikke forbundet, start som access point til konfiguration 
     Serial.println("\nStarting AP mode");
     WiFi.beginAP("ArduinoSetup"); // Opret WiFi netværk med navnet "ArduinoSetup"
     server.begin(); // Start webserveren
+
+
+    // ** WEBSERVER PART SLUT ** //
+    // ** WEBSERVER PART SLUT ** //
+    // ** WEBSERVER PART SLUT ** //
+
+
   }
 }
 
 void loop() {
   carrier.Buttons.update(); // Opdater knaptilstande
 
+
+
+  // ** WEBSERVER PART START ** //
+  // ** WEBSERVER PART START ** //
+  // ** WEBSERVER PART START ** //
+
+
   // Hvis i AP mode, håndter konfigurationsportal
   if (WiFi.status() == WL_AP_LISTENING || WiFi.status() == WL_AP_CONNECTED) {
     handleSetupPortal();
     return; // Spring over hovedlogik i AP mode
   }
+
+  
+  // ** WEBSERVER PART SLUT ** //
+  // ** WEBSERVER PART SLUT ** //
+  // ** WEBSERVER PART SLUT ** //
+
+
+
+
+
+
 
   // Hvis ikke forbundet til WiFi, vent og prøv igen
   if (WiFi.status() != WL_CONNECTED) {
@@ -290,58 +409,4 @@ void sendSensorReadingRequest(const String& id) {
   Serial.println(response);
   
   client.stop(); // Luk forbindelsen
-}
-
-// Håndter WiFi konfigurationsportal når i AP mode
-void handleSetupPortal() {
-  WiFiClient client = server.available(); // Tjek for indkomne forbindelser
-  if (client) {
-    String request = client.readStringUntil('\r'); // Læs HTTP request
-    client.flush();
-
-    // Hvis request indeholder /save? (form submission)
-    if (request.indexOf("/save?") != -1) {
-      // Udtræk SSID og password fra URL parametre
-      String ssid = getParam(request, "ssid");
-      String pass = getParam(request, "pass");
-      
-      // Hvis både SSID og password er angivet, gem dem i flash
-      if (ssid.length() > 0 && pass.length() > 0) {
-        WiFiCredentials creds;
-        ssid.toCharArray(creds.ssid, 32); // Kopier SSID til struct
-        pass.toCharArray(creds.pass, 64); // Kopier password til struct
-        wifiCredsStore.write(creds); // Gem i flash-lager
-        
-        // Send svar til browseren
-        client.println("HTTP/1.1 200 OK");
-        client.println("Content-Type: text/html");
-        client.println();
-        client.println("<h1>Saved. Rebooting...</h1>");
-        delay(2000);
-        NVIC_SystemReset(); // Genstart Arduino
-      }
-    } else {
-      // Vis WiFi konfigurationsformular
-      client.println("HTTP/1.1 200 OK");
-      client.println("Content-Type: text/html");
-      client.println();
-      client.println("<h1>WiFi Setup</h1>");
-      client.println("<form action='/save' method='GET'>");
-      client.println("SSID: <input name='ssid'><br>");
-      client.println("Password: <input name='pass' type='password'><br>");
-      client.println("<input type='submit' value='Save'>");
-      client.println("</form>");
-    }
-    client.stop(); // Luk forbindelsen
-  }
-}
-
-// Hjælpefunktion til at udtrække parametre fra URL
-String getParam(String request, String key) {
-  int start = request.indexOf(key + "="); // Find start af parameter
-  if (start == -1) return ""; // Hvis ikke fundet, returner tom streng
-  start += key.length() + 1; // Flyt markør til efter '='
-  int end = request.indexOf('&', start); // Find slutningen (enten & eller mellemrum)
-  if (end == -1) end = request.indexOf(' ', start);
-  return request.substring(start, end); // Returner parameter værdi
 }
