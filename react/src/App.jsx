@@ -5,12 +5,6 @@ import Login from './Login';
 import Settings from './Settings';
 import { useAuth } from './AuthContext';
 
-/**
- * Beskyttet rute-komponent - sikrer at kun autentificerede brugere kan tilgå visse sider
- * @param {Object} props - Komponent props
- * @param {ReactNode} props.children - Den underliggende komponent der skal beskyttes
- * @returns {ReactNode} Enten børnekomponenten, en loading-indikator eller en omdirigering til login
- */
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated } = useAuth(); // Henter autentificeringsstatus fra kontekst
 
@@ -23,9 +17,6 @@ const ProtectedRoute = ({ children }) => {
     return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
-/**
- * Hoved App-komponent - definerer applikationens routing-struktur
- */
 function App() {
     return (
         <BrowserRouter> {/* Router-komponent der håndterer navigation */}

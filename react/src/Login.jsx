@@ -17,7 +17,7 @@ function Login() {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:5001/api/Auth/login', {
+            const response = await fetch('https://176.9.37.136:7219/api/Auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ function Login() {
 
                 try {
                     console.log("Received token:", token);
-                    const verifyRes = await fetch('http://localhost:5001/api/Auth/userid', {
+                    const verifyRes = await fetch('https://176.9.37.136:7219/api/Auth/userid', {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,

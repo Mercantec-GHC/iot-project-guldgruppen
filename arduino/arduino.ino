@@ -81,7 +81,7 @@ void handleSetupPortal() {
 // ** WEBSERVER SLUT ** //
 
 // Server indstillinger for backend kommunikation
-char serverAddress[] = "192.168.1.234";
+char serverAddress[] = "176.9.37.136";
 int serverPort = 5001;
 
 // Unikt ID for Arduino'en (simulerer en UUID)

@@ -9,7 +9,7 @@ using backend.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 // Konfigurer server URLs - lyt på alle netværksinterfaces på port 5001
-builder.WebHost.UseUrls("http://0.0.0.0:5001");
+builder.WebHost.UseUrls("http://0.0.0.0:5000", "https://0.0.0.0:7219");
 
 /*** SERVICE KONFIGURATION ***/
 
@@ -50,7 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder => 
-        builder.WithOrigins("http://localhost:5173", "http://176.9.37.136:5173") // Tilladte origins
+        builder.WithOrigins("http://localhost:5173", "http://176.9.37.136:5173", "https://skyfall.gg") // Tilladte origins
             .AllowAnyMethod() // Tillad alle HTTP-metoder
             .AllowAnyHeader() // Tillad alle headers
             .AllowCredentials()); // Tillad credentials (cookies, auth headers)

@@ -32,7 +32,7 @@ function SignUp() {
         };
 
         try {
-            const response = await fetch('http://localhost:5001/api/Auth/register', {
+            const response = await fetch('https://176.9.37.136:7219/api/Auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

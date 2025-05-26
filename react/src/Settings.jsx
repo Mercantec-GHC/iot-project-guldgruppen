@@ -40,7 +40,7 @@ function Settings() {
                 throw new Error('You are not logged in');
             }
 
-            const response = await fetch('http://localhost:5001/api/Auth/update-email', {
+            const response = await fetch('https://176.9.37.136:7219/api/Auth/update-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
             `.trim();
 
             // Send email via API endpoint
-            const response = await fetch('http://localhost:5001/Mail', {
+            const response = await fetch('https://176.9.37.136:7219/Mail', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
                 throw new Error('User ID not available');
             }
 
-            const response = await fetch(`http://localhost:5001/api/Users/${userId}/set-humidity-alerts`, {
+            const response = await fetch(`https://176.9.37.136:7219/api/Users/${userId}/set-humidity-alerts`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
                 throw new Error('User ID not available');
             }
 
-            const response = await fetch(`http://localhost:5001/api/Users/${userId}/set-temperature-alerts`, {
+            const response = await fetch(`https://176.9.37.136:7219/api/Users/${userId}/set-temperature-alerts`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
                 throw new Error('User ID not available');
             }
 
-            const response = await fetch(`http://localhost:5001/api/Users/${userId}/set-alerts`, {
+            const response = await fetch(`https://176.9.37.136:7219/api/Users/${userId}/set-alerts`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
                 }
 
                 // Fetch user ID fra Auth endpoint
-                const userIdRes = await fetch('http://localhost:5001/api/Auth/userid', {
+                const userIdRes = await fetch('https://176.9.37.136:7219/api/Auth/userid', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -278,7 +278,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
                 setUserId(UserId);
 
                 // Fetch user detaljer ved hjælp af det fetchede user ID
-                const userRes = await fetch(`http://localhost:5001/api/Users/${UserId}`);
+                const userRes = await fetch(`https://176.9.37.136:7219/api/Users/${UserId}`);
                 if (!userRes.ok) throw new Error('Failed to fetch user');
                 const userData = await userRes.json();
 
@@ -287,7 +287,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
 
                 // Fetch motion alert settings
                 try {
-                    const alertSettingsRes = await fetch(`http://localhost:5001/api/Users/${UserId}/alerts`, {
+                    const alertSettingsRes = await fetch(`https://176.9.37.136:7219/api/Users/${UserId}/alerts`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -303,7 +303,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
 
                 // Fetch humidity alert settings
                 try {
-                    const humidityAlertSettingsRes = await fetch(`http://localhost:5001/api/Users/${UserId}/humidity-alerts`, {
+                    const humidityAlertSettingsRes = await fetch(`https://176.9.37.136:7219/api/Users/${UserId}/humidity-alerts`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -320,7 +320,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
 
                 // Fetch temperature alert settings
                 try {
-                    const temperatureAlertSettingsRes = await fetch(`http://localhost:5001/api/Users/${UserId}/temperature-alerts`, {
+                    const temperatureAlertSettingsRes = await fetch(`https://176.9.37.136:7219/api/Users/${UserId}/temperature-alerts`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -338,7 +338,7 @@ Timestamp: ${new Date(sensorData.timestamp).toLocaleString()}
                 const userArduinoId = userData.arduinoId;
 
                 // Fetch sensor data ved hjælp af Arduino ID
-                const sensorRes = await fetch(`http://localhost:5001/api/Sensor/${userArduinoId}`);
+                const sensorRes = await fetch(`https://176.9.37.136:7219/api/Sensor/${userArduinoId}`);
                 if (!sensorRes.ok) throw new Error('Failed to fetch sensor data');
                 const sensorArray = await sensorRes.json();
 
