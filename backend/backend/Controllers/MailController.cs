@@ -28,7 +28,7 @@ public class MailController : ControllerBase
         return Mail_Service.SendMail(Mail_Data);
     }
 
-    // HTTP POST metode til at sende sensor data til brugerens email fra Arduino.
+    // HTTP POST metode til at sende sensor data til brugerens email fra Arduino. HER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     [HttpPost("send-sensor-reading")]
     public async Task<IActionResult> SendSensorReading([FromBody] string arduinoId)
     {

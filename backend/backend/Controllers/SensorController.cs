@@ -161,7 +161,7 @@ public class SensorController : ControllerBase
         return Ok(readings);
     }
 
-    // Endpoint for at modtage kombineret data (temperatur, bevægelse, fugtighed)
+    // Endpoint for at modtage kombineret data (temperatur, bevægelse, fugtighed) HER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     [HttpPost("reading")]
     public async Task<IActionResult> PostCombinedReading([FromBody] CombinedReadingDto dto)
     {
