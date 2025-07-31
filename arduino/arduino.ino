@@ -8,8 +8,8 @@ MKRIoTCarrier carrier; // Carrier board objekt til sensorer og display
 
 // WiFi indstillinger - kan bruge hardcodede eller gemte credentials
 #define USE_HARDCODED_WIFI true
-const char* HARDCODED_SSID = "iPhone";
-const char* HARDCODED_PASS = "mysamus123";
+const char* HARDCODED_SSID = ;
+const char* HARDCODED_PASS = ;
 
 WiFiServer server(80); // Opret en server på port 80
 
